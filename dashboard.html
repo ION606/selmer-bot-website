@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selmer Bot Web Dashboard</title>
+
+    <link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico" type="image/x-icon">
+    <script src="https://kit.fontawesome.com/728e740903.js" crossorigin="anonymous"></script>
+
+    <style>
+        html { width:100%; height:100%; margin:0; padding:0; }
+
+        body {
+            /* background-color: rgb(4, 4, 85); */
+            background-color: rgb(41, 42, 48);
+            width:100%; height:100%; margin:0; padding:0;
+        }
+
+        /* .dropdown a:hover { background-color: #ddd; } */
+
+        .show { display: block; }
+
+        .hide { display: none; }
+
+
+        .jumpButton {
+			/* color: #ffffff; */
+			font-size: 15px;
+			border: 1px solid #000000;
+			width: 200px;
+            height: 40px;
+			cursor: pointer;
+            align-self: center;
+            background-color: rgb(2, 2, 192);
+		}
+		.jumpButton:hover {
+			color: #2d63c8;
+			/* background-color: #ffffff; */
+		}
+
+
+        .loadingscreen {
+            height: 90vh;
+            background-color: bisque;
+            z-index: 100;
+        }
+
+        .navbar {
+            background-color: rgb(69, 11, 102);
+            height: 50px;
+            border-width: 1px;
+            border-style: double;
+        }
+
+        #right {
+            float: right;
+            margin-right: 50px;
+        }
+
+        .box {
+            font-size: 20px;
+            height: 20px;
+            width: auto;
+            margin-bottom: 15px;
+            margin-right: 70px;
+            padding: 5px;
+            border: 1px solid black;
+            clear: both;
+            align-content: center;
+            float: right;
+            margin-right: 25px;
+        }
+
+        .statusdiv {
+            border-style: dashed;
+            border-color: rgb(247, 189, 0);
+            width: 130px;
+            height: 100px;
+            margin-top: 20px;
+            float: right;
+            margin-right: 50px;
+            text-align: center;
+        }
+
+        .saved {
+            background-color: rgb(11, 184, 11);
+        }
+        .saving {
+            background-color: orange;
+        }
+        .failed {
+            background-color: red;
+        }
+
+
+        .buttonsmainbar {
+            background-color: green;
+            width: 200px;
+            height: 40px;
+        }
+
+        .btnmain {
+            background-color: rgb(0, 0, 0);
+        }
+
+        .sidebar {
+            background-color: #42424b;
+            width: 11%;
+            position: fixed;
+            top: 53px;
+            bottom: 0;
+            display: flex;
+            flex-wrap: wrap;
+            border: 0px;
+            border-right: 2px;
+            border-color: black;
+            border-style: solid;
+        }
+
+        .btnside {
+            color: #ffffff;
+			background-color: #42424b;
+			font-size: 19px;
+			/* border: 2px solid #000000; */
+            outline: none;
+            border: none;
+			width: 100%;
+            height: 50px;
+			cursor: pointer;
+        }
+
+        .btnside:hover {
+            color: #ffffff;
+			background-color: #377aea;
+        }
+
+        .wc {
+            align-content: center;
+            align-self: center;
+            color: white;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .lg {
+            align-content: center;
+            align-self: center;
+            color: white;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            letter-spacing: 1px;
+        }
+
+
+        /* SUBMIT BUTTON START */
+        .submitButton{
+            position: relative;
+            background-color: black;
+            border-radius: 4em;
+            font-size: 16px;
+            color: white;
+            padding: 0.8em 1.8em;
+            cursor:pointer;
+            user-select:none;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition-duration: 0.4s;
+            -webkit-transition-duration: 0.4s; /* Safari */
+        }
+
+        .submitButton:hover {
+            transition-duration: 0.1s;
+            background-color: #3A3A3A;
+        }
+
+        .submitButton:after {
+            content: "";
+            display: block;
+            position: absolute;
+            border-radius: 4em;
+            left: 0;
+            top:0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: all 0.5s;
+            box-shadow: 0 0 10px 40px white;
+        }
+
+        .submitButton:active:after {
+            box-shadow: 0 0 0 0 white;
+            position: absolute;
+            border-radius: 4em;
+            left: 0;
+            top:0;
+            opacity: 1;
+            transition: 0s;
+        }
+
+        .submitButton:active {
+            top: 1px;
+        }
+        /* SUBMIT BUTTON END */
+
+        .logoutbtn {
+            margin-top: 14px;
+            scale: 1.7;
+        }
+
+        .logoutbtn:hover {
+            cursor: pointer;
+            color: red;
+        }
+
+    </style>
+
+
+    <script>
+        //Maybe pre-load the channels in the server into local storage for accessing when chosing the welcome/logging channels?
+        window.onload = () => {
+            var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
+
+            //Load the channels            serverSettings.Id
+            var xhr = new XMLHttpRequest();
+            xhr.open('get', 'https://selmer-bot-website.herokuapp.com/getChannels/', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xhr.setRequestHeader('serverNumber', serverSettings.Id);
+            xhr.onloadend = (e) => {
+                window.localStorage.setItem('channels', (xhr.response));
+                document.getElementById('body').classList.replace('hide', 'show');
+                
+                //Welcome section
+                let wc = serverSettings.WELCOME.welcomechannel || '';
+                let wm = serverSettings.WELCOME.welcomemessage || '';
+                document.getElementById('wc').setAttribute('value', wc);
+                document.getElementById('wm').setAttribute('value', wm);
+
+                //Logging section ,"LOG":{"_id":"LOG","keepLogs":false,"logchannel":null,"severity":0}}
+                let kl = serverSettings.LOG.keepLogs || false;
+                let lc = serverSettings.LOG.logchannel || '';
+                let ls = serverSettings.LOG.severity || 0;
+
+                document.getElementById('kl').checked = kl;
+                document.getElementById('lc').setAttribute('value', lc);
+
+                // document.getElementById('ls').children[ls].checked = true; //Doesn't work
+            }
+
+            xhr.send();
+        }
+
+
+        function logout() {
+            window.localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <script>
+        function loadWelcomePage() {
+            document.getElementById('welcome').classList.replace('hide', 'show');
+        }
+
+
+        function loadLoggingPage() {
+            document.getElementById('log').classList.replace('hide', 'show');
+        }
+
+        
+        function divChange(c1) {
+            // document.getElementById("mainDropdown").classList.toggle("show");
+            var divchildren = document.getElementById('inputs').children;
+
+            //Hide the divs we don't need
+            for (let i = 0; i < divchildren.length; i++) {
+                var d2 = document.getElementById(divchildren[i].id);
+                if (!d2.classList.contains('hide')) { d2.classList.add('hide'); }
+            }
+
+            //Show the div we want
+            var d1 = document.getElementById(c1);
+            d1.classList.toggle("hide");
+        }
+
+
+        function sendData(event, inp) {
+            event.preventDefault();
+
+            //Change saving status
+            var b = document.getElementById('savstat');
+            b.classList.replace('saved', 'saving');
+            b.innerText = 'SAVING';
+
+            var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
+
+            if (inp.inp == 'logs') {
+                const ls = document.getElementsByName('ls');
+                var sevname = '';
+                for (i in ls) {
+                    if (ls[i].checked) { sevname = ls[i].id.substring(3); }
+                }
+
+                const sevlist = ['none', 'low', 'meduim', 'high']
+                serverSettings.LOG.severity = sevlist.indexOf(sevname);
+                serverSettings.LOG.logchannel = document.getElementById('lc').value || null;
+
+                let kl = false;
+                if (document.getElementById('kl').checked) {
+                    kl = true;
+                }
+                serverSettings.LOG.keepLogs = kl;
+            } else {
+                const wc = document.getElementById('wc').value || null;
+                const wm = document.getElementById('wm').value || null;
+
+                serverSettings.WELCOME.welcomechannel = wc;
+                serverSettings.WELCOME.welcomemessage = wm;
+            }
+
+            //Send the data to the server
+            var xhr = new XMLHttpRequest();
+            xhr.open('post', 'https://selmer-bot-website.herokuapp.com/sendData/', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xhr.setRequestHeader('serverSettings', JSON.stringify(serverSettings));
+
+            xhr.onloadend = (e) => {
+                if (xhr.response == 'DONE') {
+                    b.classList.replace('saving', 'saved');
+                    b.innerText = 'SAVED';
+                    window.localStorage.setItem('serverInfo', JSON.stringify(serverSettings));
+                } else {
+                    b.classList.replace('saving', 'failed');
+                    b.innerText = 'FAILED';
+                }
+            }
+            
+            xhr.send(JSON.stringify(serverSettings));
+        }
+    </script>
+</head>
+
+<body id="body">
+    <!-- <center> -->
+        <div class="navbar">
+            <span style="padding-left: 50px;"></span>
+            <a href="index.html" style="color: white"><i class="fa-solid fa-house-chimney", alt="Home" style="scale: 2; margin-top: 20px;"></i></a>
+
+            <span style="padding-left:50px;">
+            <a href="myGuilds.html"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+            </span>
+
+            <span style="padding-left:50px;"></span>
+            <a href="https://github.com/ION606/selmerBot/wiki" target="_blank"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
+          
+            <span style="padding-left:50px;"></span>
+            <a href="premium.html"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
+          
+            <!-- <button>Home</button> -->
+           <span id="right">
+            <button onclick="logout()" class="logoutbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
+           </span>
+        </div>
+
+    <!-- </center> -->
+    <div class="statusdiv">
+        <h1 style="color: white; margin-bottom: 10px; margin-top: 10px;">STATUS</h1>
+        <div id="savstat" class="box saved">SAVED</div>
+    </div>
+
+    <div class="sidebar">
+      <div id="buttons" class="buttonsmainbar">
+        <button onclick="divChange('welcome')" class="btnside">Welcome</button>
+        <button onclick="divChange('log')" class="btnside">Logging</button>
+      </div>
+    </div>
+      <!-- EVERYTHING NOT SIDEBAR -->
+      <div style="margin-left:15%">
+
+        <div id="inputs">
+            <div id="welcome", class="hide wc" style="margin-top: 20px;">
+                <form>
+                    <label for="wc">Welcome Channel Name:</label>
+                    <input type="text" id="wc" name="wc"><br><br>
+
+                    <label for="wm">Welcome Message:</label>
+                    <input type="text" id="wm" name="wm"><br><br>
+                    
+                    <!-- <label for="welcomebanner">Last name:</label>
+                    <input type="text" id="wb" name="wb"><br><br> -->
+
+                    <input type="submit" value="Submit", class="submitButton" onclick="sendData(event, { 'inp': 'welcome' })">
+                </form>
+            </div>
+
+        <!-- <template> -->
+            <div id="log", class="hide lg">
+                <button style="margin-top: 30px; margin-bottom: 20px; font-size: 20px; align-self: right;" onclick="alert('When setting the log severity, setting the tier will also include all higher tiers\nFor example, using !setup log_severity none will log things from every severity')">Help</button>
+                <form>
+                    <label for="kl">Keep Logs?</label>
+                    <input type="checkbox" id="kl" name="kl"><br><br>
+        
+                    <label for="lc">Logging Channel Name:</label>
+                    <input type="text" id="lc" name="lc"><br><br>
+                    
+                    <p>Log Severity</p>
+                    <label for="ls-none">None</label>
+                    <input type="radio" id="ls-none" name="ls"><br><br>
+        
+                    <label for="ls-low">Low</label>
+                    <input type="radio" id="ls-low" name="ls"><br><br>
+        
+                    <label for="ls-meduim">Medium</label>
+                    <input type="radio" id="ls-meduim" name="ls"><br><br>
+        
+                    <label for="ls-high">High</label>
+                    <input type="radio" id="ls-high" name="ls"><br><br>
+        
+        
+                    <input type="submit" value="Submit", class="submitButton" onclick="sendData(event, { 'inp': 'logs' })">
+                </form>
+            </div>
+        </div>
+      <!-- </template> -->
+
+    </div>
+    
+</body>
+</html>

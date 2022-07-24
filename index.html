@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Selmer Bot Web Dashboard</title>
+	
+	<link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico" type="image/x-icon">
+	<script src="https://kit.fontawesome.com/728e740903.js" crossorigin="anonymous"></script>
+
+	<!-- <script type="text/javascript" src="main.js"></script> -->
+
+	<style>
+		html { width:100%; height:100%; margin:0; padding:0; }
+
+		body {
+			background-color: rgb(41, 42, 48);
+			width:100%; height:100%; margin:0; padding:0;
+		}
+
+		.loginbtn {
+			color: #ffffff;
+			background-color: #2909c6;
+			font-size: 19px;
+			border: 2px solid #000000;
+			padding: 15px;
+			cursor: pointer;
+			width: 200px;
+		}
+		.loginbtn:hover {
+			color: #ffffff;
+			background-color: #377aea;
+		}
+
+		.tooltip {
+			position: relative;
+			display: inline-block;
+			cursor: default;
+		}
+
+		.tooltip .tooltiptext {
+			visibility: hidden;
+			padding: 0.25em 0.5em;
+			background-color: black;
+			color: #fff;
+			text-align: center;
+			border-radius: 0.25em;
+			white-space: nowrap;
+			
+			/* Position the tooltip */
+			position: absolute;
+			z-index: 1;
+			top: 100%;
+			left: 100%;
+			transition-property: visibility;
+			transition-delay: 0s;
+		}
+
+		.tooltip:hover .tooltiptext {
+			visibility: visible;
+			transition-delay: 0.3s;
+		}
+
+		.navbar {
+            background-color: rgb(69, 11, 102);
+            height: 50px;
+            border-width: 1px;
+            border-style: double;
+        }
+
+        #right {
+            float: right;
+            margin-right: 50px;
+        }
+
+		.logoutbtn {
+            margin-top: 14px;
+            scale: 1.7;
+        }
+
+        .logoutbtn:hover {
+            cursor: pointer;
+            color: red;
+        }
+	</style>
+
+ 	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> (no github icon so...) -->
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<script>
+		function generateRandomString() {
+			let randomString = '';
+			const randomNumber = Math.floor(Math.random() * 10);
+
+			for (let i = 0; i < 20 + randomNumber; i++) {
+				randomString += String.fromCharCode(33 + Math.floor(Math.random() * 94));
+			}
+
+			return randomString;
+		}
+
+		window.onload = () => {
+			const fragment = new URLSearchParams(window.location.hash.slice(1));
+			const [accessToken, tokenType, state] = [fragment.get('access_token'), fragment.get('token_type'), fragment.get('state')];
+
+			if (!accessToken && !window.localStorage.getItem('serverInfo')) {
+				const randomString = generateRandomString();
+				localStorage.setItem('oauth-state', randomString);
+				document.getElementById('guildslink').href = '';
+				document.getElementById('guildslink').style = 'cursor: no-drop;';
+
+				document.getElementById('login').href += `&state=${encodeURIComponent(btoa(randomString))}`;
+				return document.getElementById('login').style.display = 'block';
+			} else if (!accessToken && window.localStorage.getItem('serverInfo')) {
+				//Maybe do something?
+			}
+
+			if (localStorage.getItem('oauth-state') !== atob(decodeURIComponent(state))) {
+				console.log('You may have been click-jacked!');
+			}
+
+			fetch('https://discord.com/api/users/@me', {
+				headers: {
+					authorization: `${tokenType} ${accessToken}`,
+				},
+			})
+				.then(result => result.json())
+				.then(response => {
+					// document.getElementById('TEMP').innerText = response.toString();
+					// console.log(response);
+					const { id, username, discriminator } = response;
+					window.localStorage.setItem('Id', id);
+					// console.log(guilds);
+					// document.getElementById('info').innerText += ` ${username}#${discriminator}`;
+
+					// window.location = `https://selmer-bot-website.herokuapp.com/user?id=${id}`;
+				})
+				.catch(console.error);
+
+				//Guilds section
+			fetch('https://discord.com/api/users/@me/guilds', {
+				// method: 'POST',
+				headers: {
+					authorization: `${tokenType} ${accessToken}`,
+				}
+			}).then(response => {
+				response.json().then((result) => {
+					
+					const owned = result.filter((inp) => { return (inp.owner); });
+					// window.localStorage.setItem('guilds', owned);
+
+					alert('Loading, please hold!\nps - You can close this alert :)');
+					var xhr = new XMLHttpRequest();
+					xhr.open('post', 'https://selmer-bot-website.herokuapp.com/user/', true);
+					xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+					xhr.setRequestHeader('guilds', JSON.stringify(owned));
+					xhr.setRequestHeader('userId', window.localStorage.getItem('Id'));
+
+					xhr.onloadend = (e) => { window.localStorage.setItem('guilds', (JSON.stringify(xhr.response))); window.location = 'https://selmer-bot-website.herokuapp.com/myGuilds.html'; }
+					xhr.send(JSON.stringify(owned));
+				}).then((r) => {
+
+				})
+			})
+			.catch(console.error);
+		}
+	</script>
+
+	<script>
+		//Get the redirect link   <!-- NOTE: "response_type=token" ALWAYS!!! https://selmer-bot-website.herokuapp.com -->
+		function getAPIRedirect() {
+			if (window.location.href.indexOf('localhost') != -1) {
+				alert(1);
+				return 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
+			} else {
+				return "https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fselmer-bot-website.herokuapp.com%2F&response_type=token&scope=identify%20guilds"
+			}
+		}
+
+		function logout() {
+            window.localStorage.clear();
+            window.location.href = 'index.html';
+        }
+	</script>
+</head>
+<body>
+
+	<!-- Nav Bar -->
+	<div class="navbar">
+		<span style="padding-left: 50px;"></span>
+		<a href="index.html" style="color: white"><i class="fa-solid fa-house-chimney", alt="Home" style="scale: 2; margin-top: 20px;"></i></a>
+
+		<span style="padding-left:50px;">
+		<a href="myGuilds.html" id="guildslink"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+		</span>
+
+		<span style="padding-left:50px;"></span>
+		<a href="https://github.com/ION606/selmerBot/wiki" target="_blank"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
+		
+		<span style="padding-left:50px;"></span>
+		<a href="premium.html"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
+	   <!-- <button>Home</button> -->
+	   <span id="right">
+		<button onclick="logout()" class="logoutbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
+	   </span>
+	</div>
+	
+	<center>
+		<h1 style="color: white">SELMER BOT WEB DASHBOARD</h1>
+		<button id="login" class="loginbtn" onclick="window.location = getAPIRedirect()">Log Into Dashboard</button>
+		<div></div>
+		
+		<a href="https://github.com/ION606/selmerBot" class="tooltip" style="cursor: pointer; margin-top: 10px;"><i class="fa fa-github" style="font-size:72px; color: #000000; margin: 10px;" alt="Github Repository"></i><span class="tooltiptext">Github Repository</span></a>
+		
+		<div></div>
+		<div class="tooltip">
+			<a href="https://discord.com/oauth2/authorize?client_id=944046902415093760&scope=applications.commands+bot&permissions=549755289087" ><img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" style="width: 72px; height: 72px; margin-top: 10px;" alt="Discord Invite Link"> <span class="tooltiptext">Discord Invite Link</span> </a>
+		</div>
+		
+	</center>
+	
+	
+
+
+	<!-- <script type="module" src="./main.js", type="application/json"></script> -->
+</body>
+</html>

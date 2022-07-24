@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selmer Bot Web Dashboard</title>
+
+    <link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico" type="image/x-icon">
+    <script src="https://kit.fontawesome.com/728e740903.js" crossorigin="anonymous"></script>
+    <style>
+        html { width:100%; height:100%; margin:0; padding:0; }
+
+        body {
+            /* background-color: rgb(4, 4, 85); */
+            background-color: rgb(38, 39, 49);
+            width:100%; height:100%; margin:0; padding:0;
+            color: white;
+        }
+        .navbar {
+            background-color: rgb(69, 11, 102);
+            height: 50px;
+            border-width: 1px;
+            border-style: double;
+        }
+
+        #right {
+            float: right;
+            margin-right: 50px;
+        }
+
+        .logoutbtn {
+            margin-top: 14px;
+            scale: 1.7;
+        }
+
+        .logoutbtn:hover {
+            cursor: pointer;
+            color: red;
+        }
+
+
+        h1 {
+            color: rgb(0, 74, 235);
+            outline-style: dotted;
+            text-align: center;
+            margin-right: 1%;
+            margin-left: 1%;
+        }
+
+        h2 {
+            color: rgb(255, 255, 255);
+            text-align: center;
+        }
+
+        p {
+            color: white;
+            margin-left: 1%;
+        }
+
+        h3 {
+            margin-left: 1%;
+        }
+    </style>
+
+
+    <script>
+        window.onload = () => {
+            if (!window.localStorage.getItem('serverInfo')) {
+                document.getElementById('guildslink').href = '';
+				document.getElementById('guildslink').style = 'cursor: no-drop;';
+            }
+        }
+        function logout() {
+            window.localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</head>
+<body>
+
+    <div class="navbar">
+        <span style="padding-left: 50px;"></span>
+        <a href="index.html" style="color: white"><i class="fa-solid fa-house-chimney", alt="Home" style="scale: 2; margin-top: 20px;"></i></a>
+
+        <span style="padding-left:50px;">
+        <a href="myGuilds.html" id="guildslink"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+        </span>
+
+        <span style="padding-left:50px;"></span>
+        <a href="https://github.com/ION606/selmerBot/wiki" target="_blank"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
+       
+        <span style="padding-left:50px;"></span>
+		<a href="premium.html"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
+       
+        <!-- <button>Home</button> -->
+       <span id="right">
+        <button onclick="logout()" class="logoutbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
+       </span>
+    </div>
+
+    <!-- Main Page -->
+    <h1>SELMER BOT PREMIUM</h1>
+    
+    <h2>
+        <u>Experience All Selmer Bot has to offer!</u>
+    </h2>
+
+    <h2 style="font-size: 50px; margin: 20px; text-align: left; color: gold;">AI</h2>
+    <h3>Chat with Selmer Bot!</h3>
+    <img src = ''>
+</body>
+</html>

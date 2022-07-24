@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Selmer Bot Web Dashboard</title>
+
+    <link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico" type="image/x-icon">
+
+    <style>
+        html { width:100%; height:100%; margin:0; padding:0; }
+
+        body {
+            background-color: rgb(41, 42, 48);
+            width:100%; height:100%; margin:0; padding:0;
+        }
+
+        .server {
+            padding: 30px;
+            width: 100px;
+            height: 100px;
+            align-content: top;
+            object-fit:scale-down;
+        }
+        .serverImgIn {
+            width: 100px;
+            height: 100px;
+            object-fit:scale-down;
+            border-radius:50%;
+            cursor: pointer;
+        }
+
+        .serverImgOut {
+            width: 100px;
+            height: 100px;
+            object-fit:scale-down;
+            border-radius:50%;
+            cursor: pointer;
+            filter: grayscale(100%);
+        }
+
+        .serverRow {
+            display: flex;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+        }
+    </style>
+
+    <script>
+        function createServerPage() {
+            var tempPage = "<html>" + "HELLO WORLD, I'M A BLANK PAGE!" + "</html>";
+            var w = window.open('TEMP');
+            w.document.write(tempPage);
+        }
+    </script>
+
+
+    <script>
+        window.onload = () => {
+            const guilds = JSON.parse(JSON.parse(window.localStorage.getItem('guilds')));
+
+            var wrapper = document.getElementById('wrapper');
+            
+            var row = document.createElement("servers_row");
+            row.innerHTML = ""; // clear images
+            row.classList.add('serverRow');
+
+            for (let i = 0; i < guilds.length; i++) {
+                //New row every 10 servers
+                if (i % 10 == 0) {
+                    wrapper.appendChild(row);
+                    row.innerHTML = "";
+                    row.classList.add('serverRow');
+                }
+
+                var div = document.createElement("div");
+                var imagem = document.createElement("img");
+                var name = document.createElement("p");
+                name.innerText = guilds[i].name;
+                name.style = "color: white";
+
+                if (guilds[i].icon) {
+                    imagem.src = `https://cdn.discordapp.com/icons/${guilds[i].id}/${guilds[i].icon}.png`;
+                } else {
+                    imagem.src = 'https://github.com/ION606/selmer-bot-website/blob/main/assets/circleOutline.png?raw=true';
+                }
+
+                if (guilds[i].inServer) {
+                    // imagem.classList.add('serverImgIn');
+                    imagem.className = 'serverImgIn';
+
+                    //OPEN A NEW WINDOW FOR SERVER EDITING
+                    imagem.onclick = function() {
+                        console.log('LOADING.....');
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('post', 'https://selmer-bot-website.herokuapp.com/getServer/', true);
+                        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                        xhr.setRequestHeader('serverNumber', guilds[i].id);
+                        xhr.onloadend = (e) => { window.localStorage.setItem('serverInfo', (xhr.response)); window.location = 'https://selmer-bot-website.herokuapp.com/dashboard.html'; }
+                        xhr.send();
+                    }
+                } else {
+                    // imagem.classList.add('serverImgOut');
+                    imagem.className = 'serverImgOut';
+                    imagem.onclick = function() {
+                        window.open('https://discord.com/oauth2/authorize?client_id=926551095352901632&scope=applications.commands+bot&permissions=549755289087');
+                    }//OPEN A NEW WINDOW WITH SERVER INVITE
+
+                }
+
+                div.appendChild(imagem);
+                div.appendChild(name);
+
+                div.classList.add('server');
+
+                row.appendChild(div);
+            }
+
+            wrapper.appendChild(row);
+            wrapper.appendChild(document.createElement('div'));
+        }
+    </script>
+
+</head>
+
+<body>
+    <div id="wrapper">
+        <!-- PLACEHOLDER TEXT HERE -->
+        <!-- <img id="1" src="https://cdn.discordapp.com/icons/930148608400035860/76aab371cf5393ee9ae56c7493c656d4.png" alt="" title="" style="cursor: pointer; border-radius: 50%; border: 3px solid rgb(106, 255, 170);" width="128" height="128"> -->
+    </div>
+</body>

@@ -7,6 +7,11 @@
 	
 	<link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico" type="image/x-icon">
 	<script src="https://kit.fontawesome.com/728e740903.js" crossorigin="anonymous"></script>
+	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 	<!-- <script type="text/javascript" src="main.js"></script> -->
 
@@ -15,21 +20,17 @@
 
 		body {
 			background-color: rgb(41, 42, 48);
+			/* background-color: rgb(1, 1, 59); */
 			width:100%; height:100%; margin:0; padding:0;
 		}
 
 		.loginbtn {
-			color: #ffffff;
-			background-color: #2909c6;
-			font-size: 19px;
-			border: 2px solid #000000;
-			padding: 15px;
-			cursor: pointer;
-			width: 200px;
+            margin-top: 14px;
+            scale: 1.2;
+			border-radius: 10%;
 		}
 		.loginbtn:hover {
-			color: #ffffff;
-			background-color: #377aea;
+			color: #377aea;
 		}
 
 		.tooltip {
@@ -61,12 +62,10 @@
 			transition-delay: 0.3s;
 		}
 
-		.navbar {
-            background-color: rgb(69, 11, 102);
-            height: 50px;
-            border-width: 1px;
-            border-style: double;
-        }
+		.navbar .nav-item {
+			margin-right: 25px;
+			margin-left: 25px;
+		}
 
         #right {
             float: right;
@@ -75,13 +74,71 @@
 
 		.logoutbtn {
             margin-top: 14px;
-            scale: 1.7;
+            scale: 1.2;
+			border-radius: 10%;
+			/* float: right; */
         }
 
         .logoutbtn:hover {
             cursor: pointer;
             color: red;
         }
+
+		.desctext {
+			/* float:left; */
+			color: white;
+			/* margin-left: 50px; */
+			margin-top: 20px;
+			background-color: rgb(1, 69, 196, 0.1);
+			padding: 20px;
+			border-radius: 10%;
+			width: auto;
+		}
+
+		/*************************
+			CAROUSEL
+		*************************/
+
+		.carousel .carousel-inner {
+			height: 550px;
+			margin-top: 20px;
+			margin-bottom: 100px;
+			background: #faf9f9;
+			border:1px dashed rgb(255, 166, 0);
+			
+		}
+
+		.carousel-control.right,
+		.carousel-control.left {
+			background-image: none;
+		}
+
+		.control-icon {
+			color: #393939;
+			text-shadow: none;
+		}
+
+		.carousel-inner {
+			position: relative;
+			height: 300px;
+		}
+
+		.carousel-img {
+			/* width: 200px;
+			height: 400px; */
+			background-size: cover;
+			position: relative;
+			/* top: 50px; */
+			transform: translateY(5%);
+		}
+
+		.cat-title {
+			text-shadow: none;
+		}
+
+		.item{
+			position: relative;
+		}
 	</style>
 
  	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> (no github icon so...) -->
@@ -100,6 +157,8 @@
 		}
 
 		window.onload = () => {
+			// createBody();
+
 			const fragment = new URLSearchParams(window.location.hash.slice(1));
 			const [accessToken, tokenType, state] = [fragment.get('access_token'), fragment.get('token_type'), fragment.get('state')];
 
@@ -109,10 +168,23 @@
 				document.getElementById('guildslink').href = '';
 				document.getElementById('guildslink').style = 'cursor: no-drop;';
 
+				// $(".custom-alert").slideUp(0);
+
 				document.getElementById('login').href += `&state=${encodeURIComponent(btoa(randomString))}`;
 				return document.getElementById('login').style.display = 'block';
 			} else if (!accessToken && window.localStorage.getItem('serverInfo')) {
-				//Maybe do something?
+				//The user is already logged in
+				document.getElementById('loginbtn').style.display = 'none'
+				document.getElementById('logoutbtn').style.display = "block";
+			} else {
+				document.getElementById('alertrow').style = "";
+				$(".custom-alert").slideDown(500);
+
+				window.setTimeout(function() {			
+					$(".custom-alert").slideUp(500, function() {
+						$(this).remove();
+					});
+				}, 5000);
 			}
 
 			if (localStorage.getItem('oauth-state') !== atob(decodeURIComponent(state))) {
@@ -133,7 +205,7 @@
 					// console.log(guilds);
 					// document.getElementById('info').innerText += ` ${username}#${discriminator}`;
 
-					// window.location = `https://selmer-bot-website.herokuapp.com/user?id=${id}`;
+					// window.location = `http://:53134/user?id=${id}`;
 				})
 				.catch(console.error);
 
@@ -149,7 +221,7 @@
 					const owned = result.filter((inp) => { return (inp.owner); });
 					// window.localStorage.setItem('guilds', owned);
 
-					alert('Loading, please hold!\nps - You can close this alert :)');
+					// alert('Loading, please hold!\nps - You can close this alert :)');
 					var xhr = new XMLHttpRequest();
 					xhr.open('post', 'https://selmer-bot-website.herokuapp.com/user/', true);
 					xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
@@ -159,7 +231,7 @@
 					xhr.onloadend = (e) => { window.localStorage.setItem('guilds', (JSON.stringify(xhr.response))); window.location = 'https://selmer-bot-website.herokuapp.com/myGuilds.html'; }
 					xhr.send(JSON.stringify(owned));
 				}).then((r) => {
-
+					
 				})
 			})
 			.catch(console.error);
@@ -170,7 +242,6 @@
 		//Get the redirect link   <!-- NOTE: "response_type=token" ALWAYS!!! https://selmer-bot-website.herokuapp.com -->
 		function getAPIRedirect() {
 			if (window.location.href.indexOf('localhost') != -1) {
-				alert(1);
 				return 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
 			} else {
 				return "https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fselmer-bot-website.herokuapp.com%2F&response_type=token&scope=identify%20guilds"
@@ -182,46 +253,292 @@
             window.location.href = 'index.html';
         }
 	</script>
+
+	<script>
+		// function createBody() {
+		// 	var temp = document.getElementById("mainTemplate");
+		// 	var clon = temp.content.cloneNode(true);
+		// 	document.body.appendChild(clon);
+		// }
+	</script>
 </head>
+
+
+
 <body>
 
+
 	<!-- Nav Bar -->
-	<div class="navbar">
-		<span style="padding-left: 50px;"></span>
-		<a href="index.html" style="color: white"><i class="fa-solid fa-house-chimney", alt="Home" style="scale: 2; margin-top: 20px;"></i></a>
+	<nav class="navbar navbar-expand-sm bg-black">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="index.html">
+				<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Selmer-icon.png?raw=true" alt="Selmer Icon" style="width: 50px;">
+			</a>
+			
+			<!-- <li class="nav-item">
+				<a href="index.html" style="color: white" class="nav-link"><i class="fa-solid fa-house-chimney", alt="Home" style="scale: 2;"></i></a>
+			</li> -->
+			<ul class="navbar-nav">
+			<li class="nav-item">
+				<a href="myGuilds.html" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+			</li>
 
-		<span style="padding-left:50px;">
-		<a href="myGuilds.html" id="guildslink"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
-		</span>
+			<li class="nav-item">
+				<a href="https://github.com/ION606/selmerBot/wiki" target="_blank" class="nav-link"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
+			</li>
+			
+			<li class="nav-item">
+			<a href="premium.html" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
+			</li>
+		</ul>
+		<!-- <button type="button" class="btn btn-primary" data-bs-toggle="tooltip" title="Hooray!">Hover over me!</button> -->
 
-		<span style="padding-left:50px;"></span>
-		<a href="https://github.com/ION606/selmerBot/wiki" target="_blank"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
-		
-		<span style="padding-left:50px;"></span>
-		<a href="premium.html"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
-	   <!-- <button>Home</button> -->
-	   <span id="right">
-		<button onclick="logout()" class="logoutbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
-	   </span>
+			<span class="ms-auto" style="margin-right: 1%;">
+				<!-- <button id="login" class="loginbtn" onclick="window.location = getAPIRedirect()">Log Into Dashboard</button> -->
+				<button onclick="logout()" id="logoutbtn" class="logoutbtn" style="display: none;"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
+				<button onclick="window.location = getAPIRedirect()" id="loginbtn" class="loginbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log In"></i></button>
+			</span>
+		</div>
+	</nav>
+			
+	<!-- NAVBAR END -->
+
+	<div class="row custom-alert" style="display: none;" id="alertrow">
+		<div class="alert alert-warning alert-dismissible" id="banner" style="text-align: center" role="alert">
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			<strong class="mx-auto">Loading Servers...</strong> <!-- This alert box could indicate a successful or positive action. -->
+		</div>
 	</div>
 	
-	<center>
-		<h1 style="color: white">SELMER BOT WEB DASHBOARD</h1>
-		<button id="login" class="loginbtn" onclick="window.location = getAPIRedirect()">Log Into Dashboard</button>
-		<div></div>
-		
-		<a href="https://github.com/ION606/selmerBot" class="tooltip" style="cursor: pointer; margin-top: 10px;"><i class="fa fa-github" style="font-size:72px; color: #000000; margin: 10px;" alt="Github Repository"></i><span class="tooltiptext">Github Repository</span></a>
-		
-		<div></div>
-		<div class="tooltip">
-			<a href="https://discord.com/oauth2/authorize?client_id=944046902415093760&scope=applications.commands+bot&permissions=549755289087" ><img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" style="width: 72px; height: 72px; margin-top: 10px;" alt="Discord Invite Link"> <span class="tooltiptext">Discord Invite Link</span> </a>
+	<div style="text-align: center; align-content: center;">
+
+		<h2 style="color:wheat">Based off a real Professor of Logic!</h2>
+
+		<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Selmer-icon.png?raw=true" alt="Selmer Icon" style="outline-style: dashed; border-radius: 50%; outline-color: green;">	
+	</div>
+
+
+	<!-- Adds margins to the page -->
+	<div class="container">
+		<div style="margin-top: 100px;"></div>
+
+		<div id="music" class="row pb-md-5 mt-md-5">
+			<div class="col-xxl-4 col-xl-4 col-lg-5 col-md-12">
+				<img class="img-responsive" style="border-style: dashed; border-color:rgb(11, 189, 189);" src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/Audio1.png?raw=true">
+				<!-- <img class="img-responsive overlay-content" style="border-style: dashed; border-color:rgb(11, 189, 189); transform: rotate(25deg); margin-bottom: 20%; margin-left: 45%;" src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/Audio2.png?raw=true"> -->
+			</div>
+
+			<div class="col-xxl-4 col-xl-4 col-lg-5 col-md-6">
+				<div class="container desctext">
+					<p style="white-space: pre-line;">
+						Play your favorite songs with easy-to-use controls!
+					</p>
+
+					<b>Features: </b>
+					<ul>
+						<li>
+							Easy Controls
+						</li>
+						<li>
+							Audio Queue
+						</li>
+						<li>
+							Stopping, pausing and unpausing!
+						</li>
+					</ul>
+				</div>
+			</div>
 		</div>
+
+
+		<div id="anime" class="mx-auto container pt-lg-5 mt-lg-5 mt-sm-0 pt-sm-0">
+			<div id="features" class="row">
+				<div class="col-xxl-4 col-xl-5 col-lg-12 col-md-12 order-xl-first order-lg-last p-lg-0 pt-lg-4">
+					<div class="container desctext"  style="width: 440px; background-color: rgba(77, 206, 3, 0.322); height: 300px;">
+						<p style="white-space: pre-line;">
+							Get details about your favorite Anime and Manga!
+						</p>
+
+						<b>Features: </b>
+						<ul>
+							<li>
+								Three different styles: <b>Fancy, Summary, and Stats</b>
+							</li>
+							<li>
+								Get info on the newsest releases
+							</li>
+						</ul>
+						<p>
+							<i>I've actually mispelled anime/manga names several times and found some amazing new mangas</i>
+						</p>
+					</div>
+				</div>
+
+
+				<div id="animecarousel" class="carousel slide col-xxl-4 col-xl-4 col-lg-5 col-md-12" data-bs-ride="carousel" style="width: 650px; position: relative; margin: auto; height: 650px;">
+					<div class="carousel-inner" style="background-color: #36393f; height: 650px;">
+						<div class="carousel-item active" style="position: relative">
+							<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/Anime1.png?raw=true" alt="Shop1" class="d-block carousel-img">
+						</div>
+						
+						<div class="carousel-item" style="position: relative">
+							<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/Anime2.png?raw=true" alt="Shop2" class="d-block carousel-img" style="margin:auto; margin-top: 15px;">
+						</div>
+
+						<div class="carousel-item" style="position: relative; text-align: center;">
+							<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/Anime3.png?raw=true" alt="Shop2" class="d-block carousel-img" style="margin:auto; margin-top: 30px;">
+							<h2 style="margin-top: 70px; color: white; font-family: Goudy Old Style;">Reach up to Rank 101!</h2>
+						</div>
+					</div>
+
+					<button class="carousel-control-prev" type="button" data-bs-target="#animecarousel" data-bs-slide="prev">
+						<span class="carousel-control-prev-icon"></span>
+					</button>
+					<button class="carousel-control-next" type="button" data-bs-target="#animecarousel" data-bs-slide="next">
+						<span class="carousel-control-next-icon"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+
+
+		<div id="shop" class="container pt-5 pb-5">
+			<div id="features" class="row pt-5">
+				<div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+					<div id="shopcarousel" class="carousel slide" data-bs-ride="carousel" style="width: 500px; height: 300px;">
+						<div class="carousel-inner" style="background-color: #36393f; height: 300px;">
+							<div class="carousel-item active">
+								<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/shop1.png?raw=true" alt="Shop1" class="d-block carousel-img w-100">
+							</div>
+							
+							<div class="carousel-item">
+								<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/work.png?raw=true" alt="Work1" class="d-block carousel-img" style="margin:auto; margin-top: 15px;">
+								<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/balance.png?raw=true" alt="Balance1" class="d-block carousel-img" style="margin:auto">
+							</div>
+
+							<div class="carousel-item" style="text-align: center;">
+								<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/rank.png?raw=true" alt="Rank1" class="d-block carousel-img w-100" style="margin:auto; margin-top: 30px;">
+								<h2 style="margin-top: 70px; color: white; font-family: Goudy Old Style;">Reach up to Rank 101!</h2>
+							</div>
+						</div>
+
+						<button class="carousel-control-prev" type="button" data-bs-target="#shopcarousel" data-bs-slide="prev">
+							<span class="carousel-control-prev-icon"></span>
+						</button>
+						<button class="carousel-control-next" type="button" data-bs-target="#shopcarousel" data-bs-slide="next">
+							<span class="carousel-control-next-icon"></span>
+						</button>
+					</div>
+				</div>
+
+			<!-- <span class="col" style="float: right"> -->
+				<div class="desctext pt-1"  style="width: 450px; height: 200px; background-color: rgba(243, 159, 3, 0.322);">
+					<p style="white-space: pre-line;">
+						Use the shop and even add custom items!
+					</p>
+
+					<b>Features: </b>
+					<ul>
+						<li>
+							Customizable Items
+						</li>
+						<li>
+							Selling and Buying among server members
+						</li>
+						<li>
+							Earning XP and currency through work and games!
+						</li>
+					</ul>
+				</div>
+				<!-- </span> -->
+			</div>
+		</div>
+
+
+		<div id="games" class="container pt-5">
+			<div class="row pt-5">
+				<div class="col pt-5">
+					<img src="https://github.com/ION606/selmer-bot-website/blob/adb98105f825c4f9f75681c4ac513c72f184ea37/assets/tmonitor.png?raw=true" class="ps-lg-5 ps-sm-5" style="position: absolute; margin-top: 50px; scale: 1.5;">
+					
+					<div id="gamescarousel" class="carousel slide p-md-0" data-bs-ride="carousel" style="width: 600px; height: 300px;">
+						<div class="carousel-inner" style="background-color: #36393f; height: 300px; border-style: none;">
+							<div class="carousel-item active">
+								<div class="row">
+									<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/ttcplayed.jpeg?raw=true" alt="ttc1" class="d-block carousel-img col-sm-6" style="margin-top: 20px;">
+									<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/tttwon.jpeg?raw=true" alt="ttc2" class="d-block carousel-img col-sm-6" style="margin-top: 20px;">
+								</div>
+							</div>
+							
+							<div class="carousel-item" style="position: relative">
+								<div class="row">
+									<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/trivia1.png?raw=true" alt="ttc1" class="d-block carousel-img" style="margin-top: 20px;">
+									<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/triviafail.png?raw=true" alt="ttc1" class="d-block carousel-img" style="scale: 0.8">
+								</div>
+							</div>
+
+							<div class="carousel-item" style="position: relative; text-align: center;">
+								<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/triviapass.png?raw=true" alt="ttc1" class="d-block carousel-img" style="margin: auto; margin-top: 20px;">
+							</div>
+						</div>
+
+						<button class="carousel-control-prev" type="button" data-bs-target="#gamescarousel" data-bs-slide="prev">
+							<span class="carousel-control-prev-icon"></span>
+						</button>
+						<button class="carousel-control-next" type="button" data-bs-target="#gamescarousel" data-bs-slide="next">
+							<span class="carousel-control-next-icon"></span>
+						</button>
+					</div>
+				</div>
+			
+
+			<!-- <div style="margin-top: 200px;"></div> -->
+
+				<span class="container desctext col-xl-1"  style="width: 500px; background-color: rgba(243, 3, 3, 0.322); float: right; margin-top: 200px">
+					<p style="white-space: pre-line;">
+						Play games and win XP and Selmer Coins!
+					</p>
+
+					<b>Features: </b>
+					<ul>
+						<li>
+							Sever games
+						</li>
+						<li>
+							Play by yourself or others
+						</li>
+						<li>
+							Use the currency in the item shop!
+						</li>
+					</ul>
+
+					<b>Games: </b>
+					<ul>
+						<li>
+							Trivia
+						</li>
+						<li>
+							Tic Tac Toe
+						</li>
+					</ul>
+				</span>
+			</div>
+		</div>
+
+		<!-- <div style="margin-top: 500px;"></div> -->
+			<!-- <img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/AI1.png?raw=true"> -->
+
+
+		<!-- Footer -->
+		<ul style="margin-top: 100px; text-align: center;" class="row">
+			<li style="display: inline; vertical-align: text-top;">
+				<a href="https://github.com/ION606/selmerBot"><i class="fa fa-github" style="font-size:72px; color: #000000;" alt="Github Repository"></i></a>
+				<span style="margin-left: 40px;"></span>
+				<a href="https://discord.com/oauth2/authorize?client_id=944046902415093760&scope=applications.commands+bot&permissions=549755289087"><img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" style="width: 72px; height: 72px; margin-bottom: 40px;" alt="Discord Invite Link"></a>
+			</li>
+		</ul>
 		
-	</center>
-	
-	
 
-
+	</div>
 	<!-- <script type="module" src="./main.js", type="application/json"></script> -->
 </body>
 </html>

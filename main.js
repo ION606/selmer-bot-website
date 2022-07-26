@@ -47,6 +47,7 @@ async function getJSONResponse(body) {
 
 const app = express();
 // app.use(express.json());
+app.use(express.static('/assets'));
 
 app.post('/user', async(request, response) => {
 
@@ -128,6 +129,11 @@ app.get('/index.html', async (req, res) => {
 	return res.sendFile('index.html', { root: '.' });
 });
 
+
+//Stripe stuff
+app.get('/.well-known/apple-developer-merchantid-domain-association', async (req, res) => {
+	return res.sendFile('apple-developer-merchantid-domain-association', { root: '.' });
+});
 
 
 app.post('/sendData', async (req, res) => {

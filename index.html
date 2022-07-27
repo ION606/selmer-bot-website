@@ -7,6 +7,10 @@
 	
 	<link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico" type="image/x-icon">
 	<script src="https://kit.fontawesome.com/728e740903.js" crossorigin="anonymous"></script>
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300&display=swap" rel="stylesheet">
 	
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
@@ -62,6 +66,12 @@
 			transition-delay: 0.3s;
 		}
 
+		nav {
+			background-color: rgb(0, 0, 0);
+			/* color: blue; */
+			/* text-align: center; */
+		}
+
 		.navbar .nav-item {
 			margin-right: 25px;
 			margin-left: 25px;
@@ -104,7 +114,7 @@
 			margin-top: 20px;
 			margin-bottom: 100px;
 			background: #faf9f9;
-			border:1px dashed rgb(255, 166, 0);
+			border:1px solid rgb(94, 104, 104);
 			
 		}
 
@@ -138,6 +148,14 @@
 
 		.item{
 			position: relative;
+		}
+
+		.navbar-fixed-top {
+			position: fixed;
+			right: 0;
+			left: 0;
+			z-index: 1030;
+			top: 0;
 		}
 	</style>
 
@@ -267,10 +285,9 @@
 
 <body>
 
-
 	<!-- Nav Bar -->
-	<nav class="navbar navbar-expand-sm bg-black">
-		<div class="container-fluid">
+	<nav class="navbar navbar-expand-sm navbar-fixed-top">
+		<div class="container-fluid mx-auto">
 			<a class="navbar-brand" href="index.html">
 				<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Selmer-icon.png?raw=true" alt="Selmer Icon" style="width: 50px;">
 			</a>
@@ -279,20 +296,21 @@
 				<a href="index.html" style="color: white" class="nav-link"><i class="fa-solid fa-house-chimney", alt="Home" style="scale: 2;"></i></a>
 			</li> -->
 			<ul class="navbar-nav">
-			<li class="nav-item">
-				<a href="myGuilds.html" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
-			</li>
+				<li class="nav-item">
+					<a href="myGuilds.html" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+				</li>
 
-			<li class="nav-item">
-				<a href="https://github.com/ION606/selmerBot/wiki" target="_blank" class="nav-link"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
-			</li>
-			
-			<li class="nav-item">
-			<a href="premium.html" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
-			</li>
-		</ul>
+				<li class="nav-item">
+					<a href="https://github.com/ION606/selmerBot/wiki" target="_blank" class="nav-link"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
+				</li>
+				
+				<li class="nav-item">
+				<a href="premium.html" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
+				</li>
+			</ul>
+		
 		<!-- <button type="button" class="btn btn-primary" data-bs-toggle="tooltip" title="Hooray!">Hover over me!</button> -->
-
+			<div class="container" style="font-family: 'Rajdhani', sans-serif; color: white;"><h1>Selmer Bot Web Dashboard</h1></div>
 			<span class="ms-auto" style="margin-right: 1%;">
 				<!-- <button id="login" class="loginbtn" onclick="window.location = getAPIRedirect()">Log Into Dashboard</button> -->
 				<button onclick="logout()" id="logoutbtn" class="logoutbtn" style="display: none;"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
@@ -303,6 +321,19 @@
 			
 	<!-- NAVBAR END -->
 
+	<!-- Header Begin -->
+	<!-- https://livewire.thewire.in/wp-content/uploads/2018/09/ekg-line-ekg-monitor-ekg-machine-heart-health-blue-ecg-monitor-shows-the-heart-beat-the-heart-stops-for-three-seconds-and-starts-again_nelyjny6x__F0000.png -->
+	<div class="row w-100 h-100" style="background-image: url('https://www.pgsindia.co.in/wp-content/uploads/2016/01/animated-web-design-slideshow-background.gif');  background-size: cover; background-repeat: no-repeat;">
+		<div class="row w-100" style="color: rgb(10, 169, 243); text-align: center">
+			<h1 style="margin-top: 100px; -webkit-text-stroke: 2px rgb(255, 255, 255);">WELCOME TO THE SELMER BOT DASHBOARD</h1>
+		</div>
+		<div style="text-align: center;">
+			<h1 style="-webkit-text-stroke: 2px rgb(255, 255, 255);">Music, Games, an Economy System, and More!</h1>
+		</div>
+	</div>
+
+	<!-- Header End -->
+
 	<div class="row custom-alert" style="display: none;" id="alertrow">
 		<div class="alert alert-warning alert-dismissible" id="banner" style="text-align: center" role="alert">
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -310,12 +341,12 @@
 		</div>
 	</div>
 	
-	<div style="text-align: center; align-content: center;">
+	<!-- <div style="text-align: center; align-content: center;">
 
-		<h2 style="color:wheat">Based off a real Professor of Logic!</h2>
+		<!- <h2 style="color:wheat">Based off a real Professor of Logic!</h2> ->
 
 		<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Selmer-icon.png?raw=true" alt="Selmer Icon" style="outline-style: dashed; border-radius: 50%; outline-color: green;">	
-	</div>
+	</div> -->
 
 
 	<!-- Adds margins to the page -->
@@ -387,7 +418,7 @@
 
 						<div class="carousel-item" style="position: relative; text-align: center;">
 							<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/Anime3.png?raw=true" alt="Shop2" class="d-block carousel-img" style="margin:auto; margin-top: 30px;">
-							<h2 style="margin-top: 70px; color: white; font-family: Goudy Old Style;">Reach up to Rank 101!</h2>
+							<!-- <h2 style="margin-top: 70px; color: white; font-family: Goudy Old Style;">Reach up to Rank 101!</h2> -->
 						</div>
 					</div>
 

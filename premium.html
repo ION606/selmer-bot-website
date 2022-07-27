@@ -6,8 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Selmer Bot Web Dashboard</title>
 
-    <link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico" type="image/x-icon">
-    <script src="https://kit.fontawesome.com/728e740903.js" crossorigin="anonymous"></script>
+    <span id="IMPORTS">
+        <link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico" type="image/x-icon">
+        <script src="https://kit.fontawesome.com/728e740903.js" crossorigin="anonymous"></script>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+        <script src="https://js.stripe.com/v3/"></script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Rajdhani:wght@300&family=Rouge+Script&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    </span>
+
     <style>
         html { width:100%; height:100%; margin:0; padding:0; }
 
@@ -17,11 +31,14 @@
             width:100%; height:100%; margin:0; padding:0;
             color: white;
         }
-        .navbar {
-            background-color: rgb(69, 11, 102);
-            height: 50px;
-            border-width: 1px;
-            border-style: double;
+		.navbar .nav-item {
+			margin-right: 25px;
+			margin-left: 25px;
+		}
+
+        #right {
+            float: right;
+            margin-right: 50px;
         }
 
         #right {
@@ -29,20 +46,10 @@
             margin-right: 50px;
         }
 
-        .logoutbtn {
-            margin-top: 14px;
-            scale: 1.7;
-        }
-
-        .logoutbtn:hover {
-            cursor: pointer;
-            color: red;
-        }
-
 
         h1 {
-            color: rgb(0, 74, 235);
-            outline-style: dotted;
+            /* color: rgb(0, 74, 235); */
+            /* outline-style: dotted; */
             text-align: center;
             margin-right: 1%;
             margin-left: 1%;
@@ -61,6 +68,77 @@
         h3 {
             margin-left: 1%;
         }
+
+		.desctext {
+			color: white;
+			margin-top: 20px;
+			background-color: rgb(1, 69, 196, 0.1);
+			padding: 10px;
+			border-radius: 10%;
+            border-style: groove;
+            border-color: rgb(255, 255, 255, 0.6);
+			width: auto;
+		}
+
+        .navbar-fixed-top {
+			position: fixed;
+			right: 0;
+			left: 0;
+			z-index: 1030;
+			top: 0;
+		}
+
+        .picon {
+            border-radius: 50%;
+            background-color: rgba(255, 204, 51, 0.2);
+            box-shadow: 0 0 12px 7px rgba(252, 200, 28, 0.2);
+        }
+    </style>
+
+<!-- BUTTONS HERE -->
+    <style>
+        .logoutbtn {
+            margin-top: 14px;
+            scale: 1.2;
+			border-radius: 10%;
+        }
+
+        .logoutbtn:hover {
+            cursor: pointer;
+            color: red;
+        }
+
+		.fivedollarbtn {
+			color: #00f2f2;
+			font-size: 23px;
+			border: 1px solid #2fffe0;
+			border-radius: 10px;
+			padding: 10px 30px;
+			letter-spacing: 1px;
+			cursor: pointer
+		}
+		.fivedollarbtn:hover {
+			color: #000000;
+			background-color: #00f2f2;
+		}
+
+        .tendollarbtn {
+			color: #30f200;
+			font-size: 23px;
+			border: 1px solid #50f801;
+			border-radius: 10px;
+			padding: 10px 30px;
+			letter-spacing: 1px;
+			cursor: pointer
+		}
+		.tendollarbtn:hover {
+			color: #000000;
+			background-color: #30f200;
+		}
+
+        h1 {
+            font-family: 'Share Tech Mono', monospace;
+        }
     </style>
 
 
@@ -71,43 +149,170 @@
 				document.getElementById('guildslink').style = 'cursor: no-drop;';
             }
         }
+
         function logout() {
             window.localStorage.clear();
             window.location.href = 'index.html';
+        }
+
+
+        function pay(url, qrurl = null, qr = false) {
+            //$5 - https://buy.stripe.com/7sIfZW2Er0aZ1by000  -  https://github.com/ION606/selmer-bot-website/blob/main/assets/stripe_payment5.png?raw=true
+            //$10 - https://buy.stripe.com/14kfZWcf19Lz7zWfYZ  -  https://github.com/ION606/selmer-bot-website/blob/main/assets/stripe_payment10.png?raw=true
+            if (qr) {
+                window.open(qrurl,'MyWindow','width=266.667px,height=351.667px');
+            } else {
+                try {
+                    window.open(url, target="_blank");
+                } catch (err) {
+                    console.error(err);
+                    window.open(qrurl,'Something went wrong :( try this instead!','width=266.667px,height=351.667px');
+                }
+            }
         }
     </script>
 </head>
 <body>
 
-    <div class="navbar">
-        <span style="padding-left: 50px;"></span>
-        <a href="index.html" style="color: white"><i class="fa-solid fa-house-chimney", alt="Home" style="scale: 2; margin-top: 20px;"></i></a>
+	<!-- Nav Bar -->
+	<nav class="navbar navbar-expand-sm bg-black">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="index.html">
+				<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Selmer-icon.png?raw=true" alt="Selmer Icon" style="width: 50px;">
+			</a>
+			
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="myGuilds.html" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+                </li>
 
-        <span style="padding-left:50px;">
-        <a href="myGuilds.html" id="guildslink"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
-        </span>
+                <li class="nav-item">
+                    <a href="https://github.com/ION606/selmerBot/wiki" target="_blank" class="nav-link"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
+                </li>
+                
+                <li class="nav-item">
+                <a href="premium.html" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
+                </li>
+            </ul>
 
-        <span style="padding-left:50px;"></span>
-        <a href="https://github.com/ION606/selmerBot/wiki" target="_blank"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
-       
-        <span style="padding-left:50px;"></span>
-		<a href="premium.html"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
-       
-        <!-- <button>Home</button> -->
-       <span id="right">
-        <button onclick="logout()" class="logoutbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
-       </span>
-    </div>
+			<div class="container"><h1 style="font-family: 'Rajdhani', sans-serif; text-align: left;">Selmer Bot Web Dashboard</h1></div>
+			<span class="ms-auto" style="margin-right: 1%;">
+				<!-- <button id="login" class="loginbtn" onclick="window.location = getAPIRedirect()">Log Into Dashboard</button> -->
+				<button onclick="logout()" id="logoutbtn" class="logoutbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
+			</span>
+		</div>
+	</nav>
+	<!-- NAVBAR END -->
+
 
     <!-- Main Page -->
-    <h1>SELMER BOT PREMIUM</h1>
-    
-    <h2>
-        <u>Experience All Selmer Bot has to offer!</u>
-    </h2>
+    <div class="container">
+        <div id="titlediv" style="margin-top: 30px; margin-bottom: 150px;">
+            <h1 style="font-family: 'Cinzel', serif;">SELMER BOT PREMIUM <span class="picon"><i class="fa-solid fa-crown"></i></span></h1>
+            <h1 style="font-family: 'Rouge Script', cursive;">It's only logical!</h1>
+        </div>
 
-    <h2 style="font-size: 50px; margin: 20px; text-align: left; color: gold;">AI</h2>
-    <h3>Chat with Selmer Bot!</h3>
-    <img src = ''>
+        <h1 style="font-size: 70px;">FEATURES</h1>
+        <!-- <div id="features" class="row pb-4 pt-5" style="text-align: center; font-family: Lucida Console;">
+            <h2 style="color: gold; font-size: 60px; text-align: center; font-family: Lucida Console;">AI</h2>
+        </div> -->
+
+        <div id="AI1" class="row pb-md-5 mt-md-5">
+            <h2 style="color: gold; font-size: 60px; text-align: center; font-family: Lucida Console; margin-bottom: 60px;">AI</h2>
+            <div class="col-xxl-4 col-xl-4 col-lg-5 col-md-12">
+                <img class="img-responsive" style="border-style: groove; border-color:rgb(11, 189, 189);" src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/AI1.png?raw=true">
+                <!-- <img class="img-responsive overlay-content" style="border-style: dashed; border-color:rgb(11, 189, 189); transform: rotate(25deg); margin-bottom: 20%; margin-left: 45%;" src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/Audio2.png?raw=true"> -->
+            </div>
+
+            <div class="col-xxl-4 col-xl-4 col-lg-5 col-md-6">
+                <div class="container desctext" style="width: 500px; font-family: Lucida Console;">
+                    <p style="white-space: pre-line;">
+                        <b>Chat with Selmer Bot using State-of-the-Art AI!</b>
+                        <p>
+                            Talk with Selmer Bot about anything!
+                            From the weather to sports to the meaning of life,
+                            Selmer Bot will make sure you won't get bored!
+                        </p>
+                        <i>He can even (poorly) help with your homework!</i>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="AI2" class="row pb-5 mt-md-5 pt-5">
+            <div class="col-xxl-5 col-xl-6 col-lg-12 col-md-12 order-xl-first order-md-last order-sm-last">
+                <div class="container desctext" style="width: 500px; font-family: Lucida Console; background-color: rgba(255, 196, 0, 0.384);">
+                    <p style="white-space: pre-line;">
+                        <b>The AI also comes with real-world data!</b>
+                        <p>
+                            Get semi-accurate weather reports,
+                            the best burger places in town and even what the best
+                            milkshake flavor is!
+                        </p>
+                    </p>
+                </div>
+            </div>
+            <div class="col-xxl-6 col-xl-6 col-lg-12 col-md-12">
+                <img class="img-responsive" style="border-style: groove; border-color:rgb(255, 153, 0);" src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/AI_weather.png?raw=true">
+                <!-- <img class="img-responsive overlay-content" style="border-style: dashed; border-color:rgb(11, 189, 189); transform: rotate(25deg); margin-bottom: 20%; margin-left: 45%;" src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Features/Audio2.png?raw=true"> -->
+            </div>
+        </div>
+
+
+
+        <div class="row pt-5" style="margin-top: 70px; margin-bottom: 0px;"><h1 style="font-size: 50px;">GET THE PREMIUM MONTHLY PLAN</h1></div>
+        <div id="paymentbuttons" class="row pt-5 pb-5">
+            <div id="fivedollar" class="col-6">
+                <button type="button" class="btn fivedollarbtn float-end" onclick="pay('https://buy.stripe.com/7sIfZW2Er0aZ1by000', 'https://github.com/ION606/selmer-bot-website/blob/main/assets/stripe_payment5.png?raw=true')">
+                    Basic Tier - $5
+                </button>
+            </div>
+
+            <div id="tendollar" class="col-6">
+                <button type="button" class="btn tendollarbtn float-start" onclick="pay('https://buy.stripe.com/14kfZWcf19Lz7zWfYZ', 'https://github.com/ION606/selmer-bot-website/blob/main/assets/stripe_payment10.png?raw=true')">
+                    Special Tier - $10
+                </button>
+            </div>
+        </div>
+
+        <div class="row pt-5" id="paymentbuttonQR">
+            <h2>Want to pay from your phone? Use our QR codes instead!</h2>
+
+            <div class="col-6 pt-3">
+                <button class="btn-lg btn-primary float-end" type="button" data-bs-toggle="collapse" data-bs-target="#fivedollarQR" aria-expanded="false" aria-controls="fivedollarQR">
+                    Basic Tier - $5
+                </button>
+            </div>
+
+            <div class="col-6 pt-3">
+                <button class="btn-lg btn-primary float-start" type="button" data-bs-toggle="collapse" data-bs-target="#tendollarQR" aria-expanded="false" aria-controls="tendollarQR">
+                    Special Tier - $10
+                </button>
+            </div>
+        </div>
+
+        <div class="row pt-3" id="paymentQRImg">
+            <div class="col-6">
+                <div class="collapse multi-collapse float-end" id="fivedollarQR">
+                    <img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/stripe_payment5.png?raw=true" style="width: 266.667px; height: 351.667px">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="collapse multi-collapse float-start" id="tendollarQR">
+                    <img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/stripe_payment10.png?raw=true" style="width: 266.667px; height: 351.667px">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    		<!-- Footer -->
+		<ul style="margin-top: 150px; text-align: center;" class="row">
+			<li style="display: inline; vertical-align: text-top;">
+				<a href="https://github.com/ION606/selmerBot"><i class="fa fa-github" style="font-size:72px; color: #000000;" alt="Github Repository"></i></a>
+				<span style="margin-left: 40px;"></span>
+				<a href="https://discord.com/oauth2/authorize?client_id=944046902415093760&scope=applications.commands+bot&permissions=549755289087"><img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" style="width: 72px; height: 72px; margin-bottom: 40px;" alt="Discord Invite Link"></a>
+			</li>
+		</ul>
+        <div style="text-align: center; margin-bottom: 20px;"><i>Disclaimer: Selmer Bot uses OpenAI integration for the chat AI. The conversation data is stored for the duration of the conversation to help provide context and is then deleted.</i></div>
 </body>
 </html>

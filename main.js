@@ -168,7 +168,7 @@ app.get('/', async ({ query }, response) => {
 					client_secret: clientSecret,
 					code,
 					grant_type: 'authorization_code',
-					redirect_uri: `http://localhost`,
+					redirect_uri: `https://selmer-bot-website.herokuapp.com`,
 					scope: 'identify',
 				}),
 				headers: {

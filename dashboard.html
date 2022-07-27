@@ -133,6 +133,12 @@
             letter-spacing: 1px;
         }
 
+        .form-select {
+            width: 200px;
+            background-color:rgb(187, 183, 183);
+            border-color: #000000;
+        }
+
     </style>
 
 <!-- Buttons -->
@@ -246,8 +252,22 @@
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('serverNumber', serverSettings.Id);
             xhr.onloadend = (e) => {
-                window.localStorage.setItem('channels', (xhr.response));
-                document.getElementById('body').classList.replace('hide', 'show');
+                //Channel Section
+                const channels = JSON.parse(xhr.response);
+                // console.log(channels.text);
+                // window.localStorage.setItem('channels', (xhr.response));
+
+                for (let i = 0; i < channels.text.length; i ++) {
+                    var channel = channels.text[i];
+                    if (channel.name && channel.id) {
+                        var opt = document.createElement('option');
+                        opt.value = channel.id;
+                        opt.innerHTML = channel.name;
+                        document.getElementById('logchanneldropdown').appendChild(opt);
+                    }
+                }
+                
+                // document.getElementById('body').classList.replace('hide', 'show');
                 
                 //Welcome section
                 let wc = serverSettings.WELCOME.welcomechannel || '';
@@ -306,6 +326,10 @@
         function sendData(event, inp) {
             event.preventDefault();
 
+            var values=Array.from($(".logchanneldropdown").find(':selected')).map(function(item){
+                return $(item).text();
+            });
+
             //Change saving status
             var b = document.getElementById('savstat');
             b.classList.replace('saved', 'saving');
@@ -322,7 +346,7 @@
 
                 const sevlist = ['none', 'low', 'meduim', 'high']
                 serverSettings.LOG.severity = sevlist.indexOf(sevname);
-                serverSettings.LOG.logchannel = document.getElementById('lc').value || null;
+                serverSettings.LOG.logchannel = document.getElementById('logchanneldropdown').value || null;
 
                 let kl = false;
                 if (document.getElementById('kl').checked) {
@@ -430,8 +454,11 @@
                     <label for="kl">Keep Logs?</label>
                     <input type="checkbox" id="kl" name="kl"><br><br>
         
-                    <label for="lc">Logging Channel Name:</label>
-                    <input type="text" id="lc" name="lc"><br><br>
+                    <!-- <label for="lc">Logging Channel Name:</label>
+                    <input type="text" id="lc" name="lc"><br><br> -->
+                    <select id="logchanneldropdown" class="form-select mb-5" aria-label="Default select example">
+                        <option selected=""></option>
+                    </select>
 
                     <div id="sevradio">
                         <p style="margin-bottom: 0px; text-underline-offset: 2px;"><u>Log Severity</u></p>

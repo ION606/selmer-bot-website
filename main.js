@@ -112,7 +112,7 @@ app.get('/getChannels', async (req, res) => {
 		}
 	})
 
-	res.send(JSON.stringify(arr));
+	res.send(arr);
 });
 
 

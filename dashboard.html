@@ -248,7 +248,7 @@
 
             //Load the channels            serverSettings.Id
             var xhr = new XMLHttpRequest();
-            xhr.open('get', 'http://localhost:53134/getChannels/', true);
+            xhr.open('get', 'https://selmer-bot-website.herokuapp.com/getChannels/', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('serverNumber', serverSettings.Id);
             xhr.onloadend = (e) => {
@@ -373,7 +373,7 @@
 
             //Send the data to the server
             var xhr = new XMLHttpRequest();
-            xhr.open('post', 'http://localhost:53134/sendData/', true);
+            xhr.open('post', 'https://selmer-bot-website.herokuapp.com/sendData/', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('serverSettings', JSON.stringify(serverSettings));
 

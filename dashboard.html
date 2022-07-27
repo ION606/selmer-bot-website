@@ -248,7 +248,7 @@
 
             //Load the channels            serverSettings.Id
             var xhr = new XMLHttpRequest();
-            xhr.open('get', 'https://selmer-bot-website.herokuapp.com/getChannels/', true);
+            xhr.open('get', 'http://localhost:53134/getChannels/', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('serverNumber', serverSettings.Id);
             xhr.onloadend = (e) => {
@@ -260,10 +260,27 @@
                 for (let i = 0; i < channels.text.length; i ++) {
                     var channel = channels.text[i];
                     if (channel.name && channel.id) {
-                        var opt = document.createElement('option');
-                        opt.value = channel.id;
-                        opt.innerHTML = channel.name;
-                        document.getElementById('logchanneldropdown').appendChild(opt);
+                        var optlog = document.createElement('option');
+                        optlog.value = channel.id;
+                        optlog.innerHTML = channel.name;
+
+                        //I need two because if I try to append the same one, it only appends to one dorpdown
+                        var optwelcome = document.createElement('option');
+                        optwelcome.value = channel.id;
+                        optwelcome.innerHTML = channel.name;
+
+                        if (serverSettings.WELCOME.welcomechannel == optwelcome.value) {
+                            optwelcome.setAttribute('selected', '');
+                        }
+
+                        if (serverSettings.LOG.logchannel == optlog.value) {
+                            optlog.setAttribute('selected', '');
+                            // optlog.selected = serverSettings.LOG.logchannel;
+                        }
+                        
+
+                        document.getElementById('logchanneldropdown').appendChild(optlog);
+                        document.getElementById('welcomechanneldropdown').appendChild(optwelcome);
                     }
                 }
                 
@@ -272,7 +289,7 @@
                 //Welcome section
                 let wc = serverSettings.WELCOME.welcomechannel || '';
                 let wm = serverSettings.WELCOME.welcomemessage || '';
-                document.getElementById('wc').setAttribute('value', wc);
+                // document.getElementById('wc').setAttribute('value', wc);
                 document.getElementById('wm').setAttribute('value', wm);
 
                 //Logging section ,"LOG":{"_id":"LOG","keepLogs":false,"logchannel":null,"severity":0}}
@@ -281,7 +298,7 @@
                 let ls = serverSettings.LOG.severity || 0;
 
                 document.getElementById('kl').checked = kl;
-                document.getElementById('lc').setAttribute('value', lc);
+                // document.getElementById('lc').setAttribute('value', lc);
 
                 // document.getElementById('ls').children[ls].checked = true; //Doesn't work
             }
@@ -326,10 +343,6 @@
         function sendData(event, inp) {
             event.preventDefault();
 
-            var values=Array.from($(".logchanneldropdown").find(':selected')).map(function(item){
-                return $(item).text();
-            });
-
             //Change saving status
             var b = document.getElementById('savstat');
             b.classList.replace('saved', 'saving');
@@ -354,16 +367,13 @@
                 }
                 serverSettings.LOG.keepLogs = kl;
             } else {
-                const wc = document.getElementById('wc').value || null;
-                const wm = document.getElementById('wm').value || null;
-
-                serverSettings.WELCOME.welcomechannel = wc;
-                serverSettings.WELCOME.welcomemessage = wm;
+                serverSettings.WELCOME.welcomechannel =  document.getElementById('welcomechanneldropdown').value || null;
+                serverSettings.WELCOME.welcomemessage = document.getElementById('wm').value || null;
             }
 
             //Send the data to the server
             var xhr = new XMLHttpRequest();
-            xhr.open('post', 'https://selmer-bot-website.herokuapp.com/sendData/', true);
+            xhr.open('post', 'http://localhost:53134/sendData/', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('serverSettings', JSON.stringify(serverSettings));
 
@@ -435,7 +445,10 @@
             <div id="welcome", class="hide wc" style="margin-top: 20px;">
                 <form>
                     <label for="wc">Welcome Channel Name:</label>
-                    <input type="text" id="wc" name="wc"><br><br>
+                    <!-- <input type="text" id="wc" name="wc"><br><br> -->
+                    <select id="welcomechanneldropdown" class="form-select mb-5" aria-label="Default select example">
+                        <option selected=""></option>
+                    </select>
 
                     <label for="wm">Welcome Message:</label>
                     <input type="text" id="wm" name="wm"><br><br>
@@ -454,8 +467,8 @@
                     <label for="kl">Keep Logs?</label>
                     <input type="checkbox" id="kl" name="kl"><br><br>
         
-                    <!-- <label for="lc">Logging Channel Name:</label>
-                    <input type="text" id="lc" name="lc"><br><br> -->
+                    <label class="ps-1" for="lc">Log Channel Name:</label>
+                    <!-- <input type="text" id="lc" name="lc"><br><br> -->
                     <select id="logchanneldropdown" class="form-select mb-5" aria-label="Default select example">
                         <option selected=""></option>
                     </select>

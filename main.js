@@ -142,13 +142,13 @@ app.post('/sendData', async (req, res) => {
 	try {
 		const pref = JSON.parse(req.headers.serversettings);
 
-		connection.then((client) => {
+		connection.then(async (client) => {
 			const dbo = client.db(pref.Id).collection('SETUP');
 
 			await dbo.updateOne({ _id: 'WELCOME' }, {$set: { welcomechannel: pref.WELCOME.welcomechannel, welcomemessage: pref.WELCOME.welcomemessage }});
 			await dbo.updateOne({ _id: 'LOG' }, {$set: { keepLogs: pref.LOG.keepLogs, logchannel: pref.LOG.logchannel, severity: pref.LOG.severity }});
 		}).then(() => { res.send("DONE"); })
-		
+
 	} catch (err) {
 		console.error(err);
 		res.send("FAILED");

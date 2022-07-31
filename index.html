@@ -242,12 +242,12 @@
 
 					// alert('Loading, please hold!\nps - You can close this alert :)');
 					var xhr = new XMLHttpRequest();
-					xhr.open('post', 'http://selmerbot.com/user/', true);
+					xhr.open('post', 'http://www.selmerbot.com/user/', true);
 					xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 					xhr.setRequestHeader('guilds', JSON.stringify(owned));
 					xhr.setRequestHeader('userId', window.localStorage.getItem('Id'));
 
-					xhr.onloadend = (e) => { window.localStorage.setItem('guilds', (JSON.stringify(xhr.response))); window.location = 'http://selmerbot.com/myGuilds.html'; }
+					xhr.onloadend = (e) => { window.localStorage.setItem('guilds', (JSON.stringify(xhr.response))); window.location = 'http://www.selmerbot.com/myGuilds.html'; }
 					xhr.send(JSON.stringify(owned));
 				}).then((r) => {
 					
@@ -258,13 +258,13 @@
 	</script>
 
 	<script>
-		//Get the redirect link   <!-- NOTE: "response_type=token" ALWAYS!!! http://selmerbot.com/ -->
+		//Get the redirect link   <!-- NOTE: "response_type=token" ALWAYS!!! http://www.selmerbot.com/ -->
 		function getAPIRedirect() {
 			if (window.location.href.indexOf('localhost') != -1) {
 				return 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
 			} else {
 				// return "https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fselmer-bot-website.herokuapp.com%2F&response_type=token&scope=identify%20guilds"
-				return 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=http%3A%2F%2Fselmerbot.com%2F&response_type=code&scope=identify%20guilds';
+				return 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=http%3A%2F%2Fwww.selmerbot.com%2F&response_type=code&scope=identify%20guilds';
 			}
 		}
 

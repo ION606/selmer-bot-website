@@ -92,10 +92,10 @@
                     imagem.onclick = function() {
                         console.log('LOADING.....');
                         var xhr = new XMLHttpRequest();
-                        xhr.open('post', 'http://selmerbot.com/getServer/', true);
+                        xhr.open('post', 'http://www.selmerbot.com/getServer/', true);
                         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                         xhr.setRequestHeader('serverNumber', guilds[i].id);
-                        xhr.onloadend = (e) => { window.localStorage.setItem('serverInfo', (xhr.response)); window.location = 'http://selmerbot.com//dashboard.html'; }
+                        xhr.onloadend = (e) => { window.localStorage.setItem('serverInfo', (xhr.response)); window.location = 'http://www.selmerbot.com//dashboard.html'; }
                         xhr.send();
                     }
                 } else {

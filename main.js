@@ -14,6 +14,8 @@ const clientId = process.env.clientId;
 const clientSecret = process.env.clientSecret;
 const port = process.env.PORT || 3000;
 const mongouri = process.env.mongouri;
+const client = new MongoClient(mongouri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+const connection = client.connect();
 
 
 const bot = new Client({ 
@@ -79,19 +81,19 @@ app.post('/getServer', async (req, res) => {
 	const id = req.headers.servernumber;
 	
 	//Get info
-	const client = new MongoClient(mongouri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-	client.connect(err => { console.error(err); });
-	const dbo = client.db(id).collection('SETUP');
-	dbo.find().toArray(async (err, docs) => {
-		if (err) { return console.error(err); }
-
-		const m = new Map();
-		m.set('Id', id);
-		await Promise.all(docs.map(async (doc) => {
-			m.set(doc._id, doc);
-
-		})).then(() => { res.send(JSON.stringify(Object.fromEntries(m))); })
-	})
+	connection.then((client) => {
+		const dbo = client.db(id).collection('SETUP');
+		dbo.find().toArray(async (err, docs) => {
+			if (err) { return console.error(err); }
+	
+			const m = new Map();
+			m.set('Id', id);
+			await Promise.all(docs.map(async (doc) => {
+				m.set(doc._id, doc);
+	
+			})).then(() => { res.send(JSON.stringify(Object.fromEntries(m))); })
+		})
+	});
 	
 	// return res.sendFile('myGuilds.html', { root: '.' });
 })
@@ -140,16 +142,13 @@ app.post('/sendData', async (req, res) => {
 	try {
 		const pref = JSON.parse(req.headers.serversettings);
 
-		const client = new MongoClient(mongouri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-		client.connect(err => { console.error(err); });
-		const dbo = client.db(pref.Id).collection('SETUP');
+		connection.then((client) => {
+			const dbo = client.db(pref.Id).collection('SETUP');
 
-		await dbo.updateOne({ _id: 'WELCOME' }, {$set: { welcomechannel: pref.WELCOME.welcomechannel, welcomemessage: pref.WELCOME.welcomemessage }});
-		await dbo.updateOne({ _id: 'LOG' }, {$set: { keepLogs: pref.LOG.keepLogs, logchannel: pref.LOG.logchannel, severity: pref.LOG.severity }});
-
-		client.close().then(() => {
-			res.send("DONE");
-		});
+			await dbo.updateOne({ _id: 'WELCOME' }, {$set: { welcomechannel: pref.WELCOME.welcomechannel, welcomemessage: pref.WELCOME.welcomemessage }});
+			await dbo.updateOne({ _id: 'LOG' }, {$set: { keepLogs: pref.LOG.keepLogs, logchannel: pref.LOG.logchannel, severity: pref.LOG.severity }});
+		}).then(() => { res.send("DONE"); })
+		
 	} catch (err) {
 		console.error(err);
 		res.send("FAILED");

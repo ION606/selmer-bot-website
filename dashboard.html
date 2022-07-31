@@ -239,6 +239,17 @@
             color: #ffffff;
 			background-color: #377aea;
         }
+
+
+        .helpbtn {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            font-size: 20px;
+            align-self: right;
+            padding: 0px;
+            border-radius: 50%;
+            border-style: solid;
+        }
     </style>
 
     <script>
@@ -246,9 +257,9 @@
         window.onload = () => {
             var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
 
-            //Load the channels            serverSettings.Id
+            //Load the channels
             var xhr = new XMLHttpRequest();
-            xhr.open('get', 'https://selmer-bot-website.herokuapp.com/getChannels/', true);
+            xhr.open('get', `http://selmerbot.com/getChannels/`, true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('serverNumber', serverSettings.Id);
             xhr.onloadend = (e) => {
@@ -304,6 +315,10 @@
             }
 
             xhr.send();
+//Get serverId
+            // xhr2 = new XMLHttpRequest();
+            // xhr.open('get', 'http://localhost:53134/getCal', true);
+            // xhr.setRequestHeader('userId', serverSettings)
         }
 
 
@@ -373,7 +388,7 @@
 
             //Send the data to the server
             var xhr = new XMLHttpRequest();
-            xhr.open('post', 'https://selmer-bot-website.herokuapp.com/sendData/', true);
+            xhr.open('post', 'http://selmerbot.com/sendData/', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('serverSettings', JSON.stringify(serverSettings));
 
@@ -420,7 +435,6 @@
         <!-- <button type="button" class="btn btn-primary" data-bs-toggle="tooltip" title="Hooray!">Hover over me!</button> -->
             <div class="container" style="font-family: 'Rajdhani', sans-serif; color: white;"><h1>Selmer Bot Web Dashboard</h1></div>
             <span class="ms-auto" style="margin-right: 1%;">
-                <!-- <button id="login" class="loginbtn" onclick="window.location = getAPIRedirect()">Log Into Dashboard</button> -->
                 <button onclick="logout()" id="logoutbtn" class="logoutbtn" style="display: none;"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
                 <button onclick="window.location = getAPIRedirect()" id="loginbtn" class="loginbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log In"></i></button>
             </span>
@@ -436,39 +450,38 @@
       <div id="buttons" class="buttonsmainbar">
         <button onclick="divChange('welcome')" class="btnside">Welcome</button>
         <button onclick="divChange('log')" class="btnside">Logging</button>
+        <!-- <button onclick="divChange('cal')" class="btnside">Calendar</button> -->
       </div>
     </div>
+
       <!-- EVERYTHING NOT SIDEBAR -->
       <div style="margin-left:15%">
 
         <div id="inputs">
             <div id="welcome", class="hide wc" style="margin-top: 20px;">
+                <button class="helpbtn" onclick="alert('Use {sn} to insert the server name, {un} to insert the user name, and {ut} to insert the user tag\nExample: Welcome to {sn} Sir {un}#{ut}')"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.downloadclipart.net%2Flarge%2F45627-icon-with-question-mark-clipart.png&f=1&nofb=1" style="width: 50px; border-radius: 50%; border-style: solid;"></button>
                 <form>
                     <label for="wc">Welcome Channel Name:</label>
-                    <!-- <input type="text" id="wc" name="wc"><br><br> -->
+
                     <select id="welcomechanneldropdown" class="form-select mb-5" aria-label="Default select example">
                         <option selected=""></option>
                     </select>
 
                     <label for="wm">Welcome Message:</label>
                     <input type="text" id="wm" name="wm"><br><br>
-                    
-                    <!-- <label for="welcomebanner">Last name:</label>
-                    <input type="text" id="wb" name="wb"><br><br> -->
 
                     <input type="submit" value="Submit", class="submitButton" onclick="sendData(event, { 'inp': 'welcome' })">
                 </form>
             </div>
 
-        <!-- <template> -->
+
             <div id="log", class="hide lg">
-                <button style="margin-top: 30px; margin-bottom: 20px; font-size: 20px; align-self: right;" onclick="alert('When setting the log severity, setting the tier will also include all higher tiers\nFor example, using !setup log_severity none will log things from every severity')">Help</button>
+                <button class="helpbtn" onclick="alert('When setting the log severity, setting the tier will also include all higher tiers\nFor example, using !setup log_severity none will log things from every severity')"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.downloadclipart.net%2Flarge%2F45627-icon-with-question-mark-clipart.png&f=1&nofb=1" style="width: 50px; border-radius: 50%; border-style: solid;"></button>
                 <form>
                     <label for="kl">Keep Logs?</label>
                     <input type="checkbox" id="kl" name="kl"><br><br>
         
                     <label class="ps-1" for="lc">Log Channel Name:</label>
-                    <!-- <input type="text" id="lc" name="lc"><br><br> -->
                     <select id="logchanneldropdown" class="form-select mb-5" aria-label="Default select example">
                         <option selected=""></option>
                     </select>
@@ -492,9 +505,12 @@
                     <input type="submit" value="Submit", class="submitButton" onclick="sendData(event, { 'inp': 'logs' })">
                 </form>
             </div>
-        </div>
-      <!-- </template> -->
 
+            <div id="cal", class="hide wc" style="margin-top: 20px;">
+                <button class="helpbtn" onclick="alert('Use {sn} to insert the server name, {un} to insert the user name, and {ut} to insert the user tag\nExample: Welcome to {sn} Sir {un}#{ut}')"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.downloadclipart.net%2Flarge%2F45627-icon-with-question-mark-clipart.png&f=1&nofb=1" style="width: 50px; border-radius: 50%; border-style: solid;"></button>
+            </div>
+
+        </div>
     </div>
     
 </body>

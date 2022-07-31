@@ -84,7 +84,6 @@ app.post('/getServer', async (req, res) => {
 	connection.then((client) => {
 		const dbo = client.db(id).collection('SETUP');
 		dbo.find().toArray(async (err, docs) => {
-			if (err) { return console.error(err); }
 	
 			const m = new Map();
 			m.set('Id', id);
@@ -167,7 +166,7 @@ app.get('/', async ({ query }, response) => {
 					client_secret: clientSecret,
 					code,
 					grant_type: 'authorization_code',
-					redirect_uri: `https://selmer-bot-website.herokuapp.com`,
+					redirect_uri: `http://selmerbot.com/`,
 					scope: 'identify',
 				}),
 				headers: {

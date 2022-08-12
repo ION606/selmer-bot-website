@@ -401,15 +401,13 @@
 
                 const res = JSON.parse(xhr2.response);
                 const times = res[0];
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[(new Date()).getMonth()]}`;
 
                 times.forEach((time, ind) => {
-                    
                     const fullDate = new Date(Number(time));
                     const month = fullDate.getMonth();
                     const day = fullDate.getDate();
-
-                    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                    document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[month]}`;
 
                     //Make sure it's the right month (old ones should be removed, this is just a catch)
                     if (month == (new Date()).getMonth()) {
@@ -467,8 +465,8 @@
     </nav>
 
 
-    <div id="cal", class="wc" style="margin-top: 20px;">
-        <h1 id="monthName", style="text-align: center; margin-top: 50px; margin-bottom: 25px;"></h1>
+    <div id="cal" class="wc" style="margin-top: 20px;">
+        <h1 id="monthName" style="text-align: center; margin-top: 50px; margin-bottom: 25px;"></h1>
         <form>
             <table id="spaceId" style="background-color: lightgrey;"
                 cellspacing="15" cellpadding="15" class="mx-auto">

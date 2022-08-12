@@ -457,15 +457,13 @@
 
                 const res = JSON.parse(xhr2.response);
                 const times = res[0];
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[(new Date()).getMonth()]}`;
 
                 times.forEach((time, ind) => {
-                    
                     const fullDate = new Date(Number(time));
                     const month = fullDate.getMonth();
                     const day = fullDate.getDate();
-
-                    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                    document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[month]}`;
 
                     //Make sure it's the right month (old ones should be removed, this is just a catch)
                     if (month == (new Date()).getMonth()) {

@@ -117,6 +117,43 @@ app.get('/getChannels', async (req, res) => {
 });
 
 
+app.get('/getCal', async (req, res) => {
+	const userId = req.headers.userid;
+
+	connection.then((client) => {
+		var times;
+
+		const dbo = client.db('main').collection('reminderKeys');
+		dbo.findOne({ userId: userId }).then((doc) => {
+			if (!doc) { return res.send([[], []]); }
+			times = doc.times;
+			let tbo = client.db('main').collection('reminders');
+
+			tbo.find({ $where: function() { return (times.indexOf(this.time) != -1 && this.userId == userId); }}).toArray((err, docs) => {
+				//There's gotta be a better way
+				let newdoc = [];
+				for (let i = 0; i < docs.length; i ++) {
+					newdoc.push({});
+					for (let j in docs[i]) {
+						if (docs[i][j].userId == userId) {
+							newdoc[i][j] = docs[i][j];
+						}
+					}
+
+					newdoc[i]._id = docs[i]._id;
+					newdoc[i].time = docs[i].time;
+					newdoc[i].amt = docs[i].amt;
+
+					//If there's nothing on that date, skip
+					// if (newdoc[i].amt == 0) { console.log(newdoc[i]); }
+				}
+
+				res.send(JSON.stringify([times, newdoc]));
+			});
+		});
+	})
+});
+
 app.get('/dashboard.html', async (req, res) => {
 	return res.sendFile('dashboard.html', { root: '.' });
 });
@@ -130,6 +167,18 @@ app.get('/index.html', async (req, res) => {
 	return res.sendFile('index.html', { root: '.' });
 });
 
+app.get('/calEvent.html', async (req, res) => {
+	return res.sendFile('calEvent.html', { root: '.' });
+});
+
+app.get('/newCalEvent.html', async (req, res) => {
+	return res.sendFile('newCalEvent.html', { root: '.' });
+});
+
+app.get('/calendar.html', async (req, res) => {
+	return res.sendFile('calendar.html', { root: '.' });
+})
+
 
 //Stripe stuff
 app.get('/.well-known/apple-developer-merchantid-domain-association', async (req, res) => {
@@ -139,20 +188,141 @@ app.get('/.well-known/apple-developer-merchantid-domain-association', async (req
 
 app.post('/sendData', async (req, res) => {
 	try {
-		const pref = JSON.parse(req.headers.serversettings);
+		if (req.headers.reminders) {
+			connection.then((client) => {
 
-		connection.then(async (client) => {
-			const dbo = client.db(pref.Id).collection('SETUP');
+				const delObjKeys = JSON.parse(req.headers.delobjkeys);
+				// const userId = req.headers.userid;
+				const dbo = client.db('main').collection('reminders');
+				const kbo = client.db('main').collection('reminderKeys');
 
-			await dbo.updateOne({ _id: 'WELCOME' }, {$set: { welcomechannel: pref.WELCOME.welcomechannel, welcomemessage: pref.WELCOME.welcomemessage }});
-			await dbo.updateOne({ _id: 'LOG' }, {$set: { keepLogs: pref.LOG.keepLogs, logchannel: pref.LOG.logchannel, severity: pref.LOG.severity }});
-		}).then(() => { res.send("DONE"); })
+				//Update the Time object
+				for (var i in delObjKeys) {
+					var obj = delObjKeys[i];
 
+					dbo.findOne({ time: obj.time }).then((doc) => {
+						if (doc) {
+							// kbo.findOne({ 'userId': doc[obj.eventInd].userId }).then((doc) => {
+							// 	console.log(doc);
+							// }); return console.log(obj.time);
+							doc.amt --;
+
+							
+							kbo.findOne({ 'userId': doc[obj.eventInd].userId }).then((kdoc) => {
+								if ((kdoc.times.length - 1) > 0) {
+									kbo.updateOne({ 'userId': doc[obj.eventInd].userId }, {$pull: { times: obj.time }});
+								} else {
+									kbo.deleteOne({ 'userId': doc[obj.eventInd].userId });
+								}
+							});
+
+							//If there's nothing left in the list, delete it
+							if (doc.amt > 0) {
+								delete doc[obj.eventInd];
+								// dbo.findOneAndUpdate({ time: obj.time }, newdoc);
+								dbo.findOneAndReplace({ time: obj.time }, doc);
+							} else {
+								dbo.deleteOne({ time: obj.time });
+							}
+						} // else { console.log("NONE", obj.time ); }
+
+					}).catch((err) =>  {
+						console.log("ERR");
+						console.error(err)
+						res.sendStatus(500);
+					});
+
+					// kbo.findOneAndUpdate({ userId: userId }, { $pull: {}})
+				}
+			}).then(() => {
+				res.sendStatus(200);
+			});
+		} else {
+			const pref = JSON.parse(req.headers.serversettings);
+
+			connection.then(async (client) => {
+				const dbo = client.db(pref.Id).collection('SETUP');
+
+				await dbo.updateOne({ _id: 'WELCOME' }, {$set: { welcomechannel: pref.WELCOME.welcomechannel, welcomemessage: pref.WELCOME.welcomemessage }});
+				await dbo.updateOne({ _id: 'LOG' }, {$set: { keepLogs: pref.LOG.keepLogs, logchannel: pref.LOG.logchannel, severity: pref.LOG.severity }});
+			}).then(() => { res.send("DONE"); })
+			.catch((err) => {
+				console.error(err);
+				res.send("FAILED");
+			});
+		}
 	} catch (err) {
 		console.error(err);
 		res.send("FAILED");
 	}
 });
+
+
+//Reminder format = { time: 1212122, event: { guildId: "930148608400035860", userId: "12", name: "Some Generic Name", description: "Some description", offset: "15", link: "https://www.example.com" } }
+app.post('/newCalEvent', async (req, res) => {
+	if (req.headers.newcalevent) {
+		
+		try {
+			const obj = JSON.parse(req.headers.newcalevent);
+			// console.log(obj.time, typeof obj.time); return;
+
+			connection.then((client) => {
+				// Update the Key object first to check if the time is already there
+				const kbo = client.db('main').collection('reminderKeys');
+				kbo.findOne(({ 'userId': obj.event.userId })).then((doc) => {
+
+					if (doc) {
+						if (doc.times.indexOf(obj.time) == -1) {
+							kbo.updateOne({ 'userId': obj.event.userId }, { $push: { times: obj.time } })
+							.catch((err) => { console.error(err); res.sendStatus(500); });
+						} else {
+							return res.sendStatus(409);
+						}
+					} else {
+						doc = { userId: obj.event.userId, times: [obj.time] }
+						kbo.insertOne(doc);
+					}
+
+
+					//Update the Time object
+					const dbo = client.db('main').collection('reminders');
+					dbo.findOne({ time: obj.time }).then((doc) => {
+						let n = 0;
+						if (doc) {
+							n = doc.amt;
+							doc.amt ++;
+
+							doc[`${n}`] = obj.event;
+							dbo.findOneAndReplace({ time: obj.time }, doc);
+						} else {
+							const d = new Date(Number(obj.time));
+							doc = { "0": obj.event, "time": obj.time, "month": d.getMonth(), "amt": 1 }; //Month used for clearing when the calendar month begins (maybe modify the garbage collection with an `else if (day == 1? clear last month)` )
+							dbo.insertOne(doc);
+						}
+
+						res.sendStatus(200);
+					}).catch((err) =>  {
+						console.log("ERR");
+						console.error(err);
+						res.sendStatus(500);
+					});
+				}).catch((err) =>  {
+					console.log("ERR");
+					console.error(err);
+					res.sendStatus(500);
+				});
+
+				// //Make sure there hasn't been an error (header not yet sent);
+				// if (res.headersSent) { return console.log("ERROR"); }
+			});
+		} catch (err) {
+			console.error(err);
+			return res.sendStatus(500);
+		}
+	}
+});
+
+
 
 app.get('/', async ({ query }, response) => {
 	const { code } = query;
@@ -185,5 +355,10 @@ app.get('/', async ({ query }, response) => {
 
 	return response.sendFile('index.html', { root: '.' });
 });
+
+
+app.get("*",(req,res) => {
+    res.sendFile("404.html", {root: '.'});
+})
 
 app.listen(port, () => console.log(`App listening on port ${port}`));

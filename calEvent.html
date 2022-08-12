@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        /* SUBMIT BUTTON START */
+        .submitButton{
+            position: relative;
+            background-color: black;
+            border-radius: 4em;
+            font-size: 16px;
+            color: white;
+            padding: 0.8em 1.8em;
+            cursor:pointer;
+            user-select:none;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition-duration: 0.4s;
+            /* margin-left: 65px; */
+            margin-left: 30px;
+            margin-bottom: 40px;
+            -webkit-transition-duration: 0.4s; /* Safari */
+        }
+
+        .submitButton:hover {
+            transition-duration: 0.1s;
+            background-color: #3A3A3A;
+        }
+
+        .submitButton:after {
+            content: "";
+            display: block;
+            position: absolute;
+            border-radius: 4em;
+            left: 0;
+            top:0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: all 0.5s;
+            box-shadow: 0 0 10px 40px white;
+        }
+
+        .submitButton:active:after {
+            box-shadow: 0 0 0 0 white;
+            position: absolute;
+            border-radius: 4em;
+            left: 0;
+            top:0;
+            opacity: 1;
+            transition: 0s;
+        }
+
+        .submitButton:active {
+            top: 1px;
+        }
+ 
+
+        .btnActive {
+			color: #ffffff;
+			background-color: #ff1117;
+			font-size: 13px;
+			border: 1px solid #000000;
+			border-radius: 9px;
+			padding: 10px 40px;
+			letter-spacing: 1px;
+			cursor: pointer;
+            margin-left: 40px;
+		}
+
+		.btnCanceled {
+			color: #ffffff;
+			background-color: #7a7a7a;
+			font-size: 13px;
+			border: 1px solid #000000;
+			border-radius: 9px;
+			padding: 10px 40px;
+			letter-spacing: 1px;
+			cursor: pointer;
+            margin-left: 40px;
+		}
+        /* SUBMIT BUTTON END */
+
+
+        .newEvtBtn {
+            margin-left: 40px;
+            color: #ffffff;
+			background-color: #0cdc01;
+            font-size: 16px;
+            border-radius: 4em;
+            padding: 0.8em 1.8em;
+			cursor: pointer
+        }
+
+        .newEvtBtn:hover {
+            color: #6e6e6e;
+			background-color: #14fe07;
+        }
+    </style>
+
+    <style>
+        body {
+            background-color: rgb(59, 58, 58);
+        }
+
+        .evtclass {
+            margin-bottom: 50px;
+            color: white;
+            line-height: 23px;
+        }
+        
+        .evtclass a {
+            color: rgb(0, 250, 237);
+        }
+
+        .evtclass a:active {
+            color: rgb(255, 0, 255);
+        }
+
+    </style>
+
+    <script>
+        window.onbeforeunload = function(){
+            window.close();
+        };
+        
+        window.onload = () => {
+            if (!window.sessionStorage.getItem('evlist')) { return; }
+
+            const d = new Date();
+            document.title = `Editing ${d.getMonth()}/${sessionStorage.getItem('day')}/${d.getFullYear()}`;
+
+            window.sessionStorage.setItem('delObjKeys', JSON.stringify([]));
+
+            const evlist = JSON.parse(window.sessionStorage.getItem('evlist'));
+
+            var b = document.getElementById('main');
+            var div = document.createElement('div');
+
+            for (ind in evlist) {
+                for (i in evlist[ind]) {
+                    if (i === 'time' || i === '_id' || i === 'amt') { continue; }
+
+                    const ev = evlist[ind][i];
+                    let p = document.createElement("p");
+                    let link = document.createElement('a');
+                    link.href = ev.link; //unnecessary?
+                    link.innerText = ev.link;
+                    link.onclick = function(event) { event.preventDefault(); window.open(ev.link, '_blank'); }
+
+                    const timeFull = new Date(Number(evlist[ind].time) + (Number(ev.offset) + 1) * 60000);
+                    var time = [timeFull.getHours().toString(), timeFull.getMinutes().toString()];
+
+                    //Make sure it looks like 01:08 and not 1:8
+                    if (time[0].length < 2) { time[0] = `0${time[0]}` }
+                    if (time[1].length < 2) { time[1] = `0${time[1]}` }
+
+                    p.innerText = `Name: ${ev.name}\nDescription: ${ev.description}\nTime: ${time[0]}:${time[1]}\nOffset: ${ev.offset}\nLocation: ${ev.location}\nLink: `;
+                    p.appendChild(link);
+                    // p.style = 'color: green; margin-bottom: 50px;';
+                    p.className = 'evtclass';
+
+                    //Add buttons
+                    let b = document.createElement('button');
+                    b.id = `${evlist[ind].time}|${i}|${ind}`;
+                    b.className = 'btnActive';
+                    b.innerText = "Cancel";
+                    b.onclick = function() {
+                        const id = this.id.split("|");
+
+                        var sstor = JSON.parse(sessionStorage.getItem('evlist'));
+                        var delObjKeys = JSON.parse(sessionStorage.getItem('delObjKeys'));
+
+                        //The keys are the same as in the cloud, sort by time and remove by key
+                        delObjKeys.push({time: id[0], eventInd: id[1]});
+
+                        delete sstor[id[2]][id[1]];
+                        sstor[id[2]].amt --; //Maybe useless (perhaps sstor is never used again)?
+                        sessionStorage.setItem('evlist', JSON.stringify(sstor));
+                        sessionStorage.setItem('delObjKeys', JSON.stringify(delObjKeys));
+                        b.className = 'btnCanceled';
+                        b.innerText = "Cancelled";
+
+                        b.onclick = function() { alert("This event has already been cancelled!"); }
+                    }
+
+                    p.appendChild(document.createElement('br'));
+                    p.appendChild(document.createElement('br'));
+                    p.appendChild(b);
+                    
+                    div.appendChild(p);
+                    // div.appendChild(document.createElement('p').style = 'margin-top=100px;');
+                }
+            }
+
+            var newbtn = document.createElement('button');
+            newbtn.className = 'newEvtBtn';
+            newbtn.innerText = "Create New Event";
+            newbtn.onclick = function() {
+                // event.preventDefault();
+                const day = Number(sessionStorage.getItem('day'));
+                createCalEvent(day)
+            }
+
+            b.appendChild(div);
+            document.getElementById('btns').appendChild(newbtn);
+
+        };
+    </script>
+
+    <!-- DUPLICATE OF ANOTHER PAGE WILL NOT LINK -->
+    <script>
+        function sendData(event, inp) {
+            event.preventDefault();
+
+            var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
+            window.opener.location.reload();
+
+            if (inp.inp == 'cal') {
+                const userId = JSON.parse(window.localStorage.getItem('Id'));
+                const delObjKeys = sessionStorage.getItem('delObjKeys');
+                
+                //Send the data to the server
+                var xhr = new XMLHttpRequest();
+                xhr.open('post', 'http://www.selmerbot.com/sendData/', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                xhr.setRequestHeader(`reminders`, true);
+                xhr.setRequestHeader(`delObjKeys`, delObjKeys);
+                
+                xhr.onloadend = (e) => {
+                    console.log(e);
+                    alert("Saved!");
+                    window.close();
+                };
+                xhr.send();
+            }
+        }
+
+        async function createCalEvent(day) {
+            // event.preventDefault();
+
+            await new Promise((res, rej) => { res(window.open('http://www.selmerbot.com/newCalEvent.html','newCalPopWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+                .then((w) => {
+                if (!w) { alert("Your browser has JavaScript Disabled!"); return w.close(); }
+
+                w.sessionStorage.setItem("day", day);
+
+                w.location.reload();
+                // w.document.write('<title>Editing ${(' + String(day) + ')}</title>');
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="main" style="margin-left: 20px;"></div>
+    <!-- NOTHING IN HERE -->
+    <div id="btns" style="margin-top: 75px;">
+        <input type="submit" value="Submit" class="submitButton" onclick="sendData(event, { 'inp': 'cal' })">
+    </div>
+</body>
+</html>

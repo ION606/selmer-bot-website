@@ -211,7 +211,7 @@
 
         .logoutbtn {
             margin-top: 14px;
-            scale: 1.7;
+            scale: 1.4;
         }
 
         .logoutbtn:hover {
@@ -250,12 +250,140 @@
             border-radius: 50%;
             border-style: solid;
         }
+
+
+        .calbtn {
+            width: 100px;
+            height: 70px;
+        }
+
+        .green {
+            background-color: rgb(6, 185, 6);
+        }
+
+        .red {
+            background-color: rgb(129, 129, 129);
+        }
+
     </style>
+
+<!-- Calendar -->
+    <script>
+
+        async function openNewCalWindow(evjs, day) {
+            const ev = JSON.parse(evjs);
+            
+            await new Promise((res, rej) => { res(window.open('http://www.selmerbot.com/calEvent.html','popUpWindow','loaction=no,width=600,height=300,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+                .then((w) => {
+                if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
+
+                w.sessionStorage.setItem("evlist", evjs);
+                w.sessionStorage.setItem('day', day);
+
+                w.location.reload();
+                w.document.write('<title>Editing ${(new Date(Number(ev.time)))}</title>');
+            })
+
+            // w.location.reload();
+        }
+
+
+        async function createCalEvent(day) {
+            await new Promise((res, rej) => { res(window.open('http://www.selmerbot.com/newCalEvent.html','popUpWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+                .then((w) => {
+                if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
+
+                w.sessionStorage.setItem("day", day);
+
+                w.location.reload();
+                // w.document.write('<title>Editing ${(' + String(day) + ')}</title>');
+            });
+        }
+
+        //Month + 1 because the 0 will set the date back a month
+        function daysInMonth (d) {
+            return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        }
+
+        function calSetup(calList) {
+            const d = new Date((new Date()).getFullYear(), (new Date()).getMonth());
+
+            const startDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay() + 1;
+            var cal = document.getElementById('calbody');
+            var tr = document.createElement('tr');
+            var dayint = 1;
+            const ll = daysInMonth(d);
+
+            for (let i = 1; i <= 42; i ++) {
+                var td = document.createElement('td');
+
+                if (i >= startDay && dayint <= ll) {
+                    let btn = document.createElement('button');
+                    btn.innerText = dayint.toString();
+                    btn.classList.add('calbtn');
+
+
+                    if (calList.has(Number(dayint.toString()))) { btn.classList.add('green'); }
+                    else { btn.classList.add('red'); }
+
+                    btn.onclick = function(event) {
+                        const timestamp = new Date(new Date().getFullYear(), new Date().getMonth(), Number(this.innerText));
+                        event.preventDefault();
+
+                        if (calList.has(Number(this.innerText))) {
+                            const ev = calList.get(Number(this.innerText));
+
+                            openNewCalWindow(JSON.stringify(ev), Number(this.innerText));
+                        } else {
+                            // Check if the day has already passed
+                            if (Number(this.innerText) >= (new Date()).getDate()) {
+                                createCalEvent(Number(this.innerText));
+                            } else {
+                                alert("Please pick a future date!");
+                            }
+                        }
+                    }
+
+                    td.appendChild(btn);
+                    dayint ++;
+                }
+
+                tr.appendChild(td);
+
+                if (i % 7 == 0) {
+                    let tr2 = document.createElement('tr');
+                    cal.appendChild(tr);
+                    cal.appendChild(tr2);
+
+                    tr2 = document.createElement('tr');
+                    tr = document.createElement('tr');
+                }
+            }
+
+            cal.appendChild(tr);
+
+            if (window.innerWidth < 1020) {
+                //Calendar resize
+                const calSpacing = document.getElementById("spaceId");
+                calSpacing.cellSpacing = 1;
+                calSpacing.cellPadding = 1;
+            }
+        }
+    </script>
 
     <script>
         //Maybe pre-load the channels in the server into local storage for accessing when chosing the welcome/logging channels?
         window.onload = () => {
             var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
+
+            if (!serverSettings) {
+                alert("Please log in to continue");
+                if (window.location.href.indexOf('localhost') != -1) {
+                    window.location = 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
+                } else {
+                    window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=http%3A%2F%2Fwww.selmerbot.com%2F&response_type=token&scope=identify%20guilds';
+                }
+            }
 
             //Load the channels
             var xhr = new XMLHttpRequest();
@@ -313,9 +441,48 @@
 
                 // document.getElementById('ls').children[ls].checked = true; //Doesn't work
             }
-
             xhr.send();
 
+            //Get serverId instead of the userId
+            const id = serverSettings.Id;
+
+            var xhr2 = new XMLHttpRequest();
+            xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
+            xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+
+            xhr2.setRequestHeader('userId', id);
+
+            xhr2.onloadend = (e) => {
+                const calList = new Map();
+
+                const res = JSON.parse(xhr2.response);
+                const times = res[0];
+
+                times.forEach((time, ind) => {
+                    
+                    const fullDate = new Date(Number(time));
+                    const month = fullDate.getMonth();
+                    const day = fullDate.getDate();
+
+                    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                    document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[month]}`;
+
+                    //Make sure it's the right month (old ones should be removed, this is just a catch)
+                    if (month == (new Date()).getMonth()) {
+                        if (calList.has(day)) {
+                            var temp = calList.get(day);
+                            temp.push(res[1][ind]);
+                            calList.set(day, temp);
+                        } else {
+                            calList.set(day, [res[1][ind]]);
+                        }
+                    }
+                });
+
+                calSetup(calList);
+            }
+
+            xhr2.send();
         }
 
 
@@ -412,12 +579,13 @@
                 <img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Selmer-icon.png?raw=true" alt="Selmer Icon" style="width: 50px;">
             </a>
             
-            <!-- <li class="nav-item">
-                <a href="index.html" style="color: white" class="nav-link"><i class="fa-solid fa-house-chimney", alt="Home" style="scale: 2;"></i></a>
-            </li> -->
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a href="myGuilds.html" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="calendar.html" id="callink" class="nav-link"><i class="fa-solid fa-calendar" alt="Calendar" style="scale: 2; color: lightgrey;"></i></a>
                 </li>
 
                 <li class="nav-item">
@@ -432,8 +600,7 @@
         <!-- <button type="button" class="btn btn-primary" data-bs-toggle="tooltip" title="Hooray!">Hover over me!</button> -->
             <div class="container" style="font-family: 'Rajdhani', sans-serif; color: white;"><h1>Selmer Bot Web Dashboard</h1></div>
             <span class="ms-auto" style="margin-right: 1%;">
-                <button onclick="logout()" id="logoutbtn" class="logoutbtn" style="display: none;"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
-                <button onclick="window.location = getAPIRedirect()" id="loginbtn" class="loginbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log In"></i></button>
+                <button onclick="logout()" id="logoutbtn" class="logoutbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
             </span>
         </div>
     </nav>
@@ -447,6 +614,7 @@
       <div id="buttons" class="buttonsmainbar">
         <button onclick="divChange('welcome')" class="btnside">Welcome</button>
         <button onclick="divChange('log')" class="btnside">Logging</button>
+        <button onclick="divChange('cal')" class="btnside">Calendar</button>
       </div>
     </div>
 
@@ -501,6 +669,63 @@
                     <input type="submit" value="Submit", class="submitButton" onclick="sendData(event, { 'inp': 'logs' })">
                 </form>
             </div>
+
+
+            <div id="cal", class="hide wc" style="margin-top: 20px;">
+                <h1 id="monthName", style="text-align: center; margin-top: 50px; margin-bottom: 25px;"></h1>
+                <form>
+                    <table id="spaceId" style="background-color: lightgrey;"
+                        cellspacing="15" cellpadding="15" class="mx-auto">
+                
+                        <!-- The tr tag is used to enter 
+                            rows in the table -->
+                
+                        <!-- It is used to give the heading to the
+                            table. We can give the heading to the 
+                            top and bottom of the table -->
+                
+                        <caption align="top">
+                            <!-- Here we have used the attribute 
+                                that is style and we have colored 
+                                the sentence to make it better 
+                                depending on the web page-->
+                        </caption>
+                
+                        <!-- Here th stands for the heading of the
+                            table that comes in the first row-->
+                
+                        <!-- The text in this table header tag will 
+                            appear as bold and is center aligned-->
+                
+                        <thead>
+                            <tr>
+                                <!-- Here we have applied inline style 
+                                    to make it more attractive-->
+                                <th style="color: white; background: purple;">
+                                    Sun</th>
+                                <th style="color: white; background: purple;">
+                                    Mon</th>
+                                <th style="color: white; background: purple;">
+                                    Tue</th>
+                                <th style="color: white; background: purple;">
+                                    Wed</th>
+                                <th style="color: white; background: purple;">
+                                    Thu</th>
+                                <th style="color: white; background: purple;">
+                                    Fri</th>
+                                <th style="color: white; background: purple;">
+                                    Sat</th>
+                            </tr>
+                        </thead>
+                
+                        <tbody id="calbody" style="color: black;">
+
+                        </tbody>
+                    </table>
+                    <!-- <input type="submit" value="Submit", class="submitButton" onclick="sendData(event, { 'inp': 'cal' })"> -->
+                </form>
+            </div>
+
         </div>
     </div>
     

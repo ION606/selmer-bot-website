@@ -102,11 +102,19 @@
             scale: 1.2;
 			border-radius: 10%;
         }
-
         .logoutbtn:hover {
             cursor: pointer;
             color: red;
         }
+
+        .loginbtn {
+            margin-top: 14px;
+            scale: 1.2;
+			border-radius: 10%;
+		}
+		.loginbtn:hover {
+			color: #377aea;
+		}
 
 		.fivedollarbtn {
 			color: #00f2f2;
@@ -147,6 +155,10 @@
             if (!window.localStorage.getItem('serverInfo')) {
                 document.getElementById('guildslink').href = '';
 				document.getElementById('guildslink').style = 'cursor: no-drop;';
+                
+                //The user is logged out
+				document.getElementById('loginbtn').style.display = 'block'
+				document.getElementById('logoutbtn').style.display = "none";
             }
         }
 
@@ -155,6 +167,15 @@
             window.location.href = 'index.html';
         }
 
+        //Get the redirect link   <!-- NOTE: "response_type=token" ALWAYS!!! http://www.selmerbot.com/ -->
+		function getAPIRedirect() {
+			if (window.location.href.indexOf('localhost') != -1) {
+				return 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
+			} else {
+				// return "https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fselmer-bot-website.herokuapp.com%2F&response_type=token&scope=identify%20guilds"
+				return 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=http%3A%2F%2Fwww.selmerbot.com%2F&response_type=token&scope=identify%20guilds';
+			}
+		}
 
         function pay(url, qrurl = null, qr = false) {
             //$5 - https://buy.stripe.com/7sIfZW2Er0aZ1by000  -  https://github.com/ION606/selmer-bot-website/blob/main/assets/stripe_payment5.png?raw=true
@@ -185,6 +206,10 @@
                 <li class="nav-item">
                     <a href="myGuilds.html" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
                 </li>
+                
+                <li class="nav-item">
+                    <a href="calendar.html" id="callink" class="nav-link"><i class="fa-solid fa-calendar" alt="Calendar" style="scale: 2; color: lightgrey;"></i></a>
+                </li>
 
                 <li class="nav-item">
                     <a href="https://github.com/ION606/selmerBot/wiki" target="_blank" class="nav-link"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
@@ -197,8 +222,8 @@
 
 			<div class="container"><h1 style="font-family: 'Rajdhani', sans-serif; text-align: left;">Selmer Bot Web Dashboard</h1></div>
 			<span class="ms-auto" style="margin-right: 1%;">
-				<!-- <button id="login" class="loginbtn" onclick="window.location = getAPIRedirect()">Log Into Dashboard</button> -->
 				<button onclick="logout()" id="logoutbtn" class="logoutbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
+				<button onclick="window.location = getAPIRedirect()" id="loginbtn" class="loginbtn" style="display: none;"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log In"></i></button>
 			</span>
 		</div>
 	</nav>

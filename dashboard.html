@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Selmer Bot Web Dashboard</title>
 
-    <link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico?raw=true?raw=true" type="image/x-icon">
     <script src="https://kit.fontawesome.com/728e740903.js" crossorigin="anonymous"></script>
 
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -385,102 +385,123 @@
                 }
             }
 
-            //Load the channels
-            var xhr = new XMLHttpRequest();
-            xhr.open('get', `http://www.selmerbot.com/getChannels/`, true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-            xhr.setRequestHeader('serverNumber', serverSettings.Id);
-            xhr.onloadend = (e) => {
-                //Channel Section
-                const channels = JSON.parse(xhr.response);
-                // console.log(channels.text);
-                // window.localStorage.setItem('channels', (xhr.response));
-
-                for (let i = 0; i < channels.text.length; i ++) {
-                    var channel = channels.text[i];
-                    if (channel.name && channel.id) {
-                        var optlog = document.createElement('option');
-                        optlog.value = channel.id;
-                        optlog.innerHTML = channel.name;
-
-                        //I need two because if I try to append the same one, it only appends to one dorpdown
-                        var optwelcome = document.createElement('option');
-                        optwelcome.value = channel.id;
-                        optwelcome.innerHTML = channel.name;
-
-                        if (serverSettings.WELCOME.welcomechannel == optwelcome.value) {
-                            optwelcome.setAttribute('selected', '');
-                        }
-
-                        if (serverSettings.LOG.logchannel == optlog.value) {
-                            optlog.setAttribute('selected', '');
-                            // optlog.selected = serverSettings.LOG.logchannel;
-                        }
-                        
-
-                        document.getElementById('logchanneldropdown').appendChild(optlog);
-                        document.getElementById('welcomechanneldropdown').appendChild(optwelcome);
-                    }
-                }
-                
-                // document.getElementById('body').classList.replace('hide', 'show');
-                
-                //Welcome section
-                let wc = serverSettings.WELCOME.welcomechannel || '';
-                let wm = serverSettings.WELCOME.welcomemessage || '';
-                // document.getElementById('wc').setAttribute('value', wc);
-                document.getElementById('wm').setAttribute('value', wm);
-
-                //Logging section ,"LOG":{"_id":"LOG","keepLogs":false,"logchannel":null,"severity":0}}
-                let kl = serverSettings.LOG.keepLogs || false;
-                let lc = serverSettings.LOG.logchannel || '';
-                let ls = serverSettings.LOG.severity || 0;
-
-                document.getElementById('kl').checked = kl;
-                // document.getElementById('lc').setAttribute('value', lc);
-
-                // document.getElementById('ls').children[ls].checked = true; //Doesn't work
-            }
-            xhr.send();
-
             //Get serverId instead of the userId
             const id = serverSettings.Id;
 
-            var xhr2 = new XMLHttpRequest();
-            xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
-            xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            //Check if the user has premium
+            var xhrverify = new XMLHttpRequest();
+            xhrverify.open('post', 'http://www.selmerbot.com/verifypremium/', true);
+            xhrverify.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
-            xhr2.setRequestHeader('userId', id);
+            //Use the guild Id as the userId
+            xhrverify.setRequestHeader('userId', id);
+            xhrverify.onloadend = (e) => {
+                console.log(xhrverify.response); //WHAT
+                if (xhrverify.response == "Unauthorized") {
+                    document.getElementById("calForm").style.display = "none";
+                    document.getElementById("unauth").style.display = "block";
+                    return;
+                } else if (xhrverify.response == 'Internal Server Error') {
+                    alert("Uh oh, an Internal Server Error has occured!\nPlease try again!");
+                    return window.location.href = "index.html";
+                }
 
-            xhr2.onloadend = (e) => {
-                const calList = new Map();
+                //Load the channels
+                var xhr = new XMLHttpRequest();
+                xhr.open('get', `http://www.selmerbot.com/getChannels/`, true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                xhr.setRequestHeader('serverNumber', id);
+                xhr.onloadend = (e) => {
+                    //Channel Section
+                    const channels = JSON.parse(xhr.response);
+                    // console.log(channels.text);
+                    // window.localStorage.setItem('channels', (xhr.response));
 
-                const res = JSON.parse(xhr2.response);
-                const times = res[0];
-                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[(new Date()).getMonth()]}`;
+                    for (let i = 0; i < channels.text.length; i ++) {
+                        var channel = channels.text[i];
+                        if (channel.name && channel.id) {
+                            var optlog = document.createElement('option');
+                            optlog.value = channel.id;
+                            optlog.innerHTML = channel.name;
 
-                times.forEach((time, ind) => {
-                    const fullDate = new Date(Number(time));
-                    const month = fullDate.getMonth();
-                    const day = fullDate.getDate();
+                            //I need two because if I try to append the same one, it only appends to one dorpdown
+                            var optwelcome = document.createElement('option');
+                            optwelcome.value = channel.id;
+                            optwelcome.innerHTML = channel.name;
 
-                    //Make sure it's the right month (old ones should be removed, this is just a catch)
-                    if (month == (new Date()).getMonth()) {
-                        if (calList.has(day)) {
-                            var temp = calList.get(day);
-                            temp.push(res[1][ind]);
-                            calList.set(day, temp);
-                        } else {
-                            calList.set(day, [res[1][ind]]);
+                            if (serverSettings.WELCOME.welcomechannel == optwelcome.value) {
+                                optwelcome.setAttribute('selected', '');
+                            }
+
+                            if (serverSettings.LOG.logchannel == optlog.value) {
+                                optlog.setAttribute('selected', '');
+                                // optlog.selected = serverSettings.LOG.logchannel;
+                            }
+                            
+
+                            document.getElementById('logchanneldropdown').appendChild(optlog);
+                            document.getElementById('welcomechanneldropdown').appendChild(optwelcome);
                         }
                     }
-                });
+                    
+                    // document.getElementById('body').classList.replace('hide', 'show');
+                    
+                    //Welcome section
+                    let wc = serverSettings.WELCOME.welcomechannel || '';
+                    let wm = serverSettings.WELCOME.welcomemessage || '';
+                    // document.getElementById('wc').setAttribute('value', wc);
+                    document.getElementById('wm').setAttribute('value', wm);
 
-                calSetup(calList);
+                    //Logging section ,"LOG":{"_id":"LOG","keepLogs":false,"logchannel":null,"severity":0}}
+                    let kl = serverSettings.LOG.keepLogs || false;
+                    let lc = serverSettings.LOG.logchannel || '';
+                    let ls = serverSettings.LOG.severity || 0;
+
+                    document.getElementById('kl').checked = kl;
+                    // document.getElementById('lc').setAttribute('value', lc);
+
+                    // document.getElementById('ls').children[ls].checked = true; //Doesn't work
+                }
+                xhr.send();
+
+                var xhr2 = new XMLHttpRequest();
+                xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
+                xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+
+                xhr2.setRequestHeader('userId', id);
+
+                xhr2.onloadend = (e) => {
+                    const calList = new Map();
+
+                    const res = JSON.parse(xhr2.response);
+                    const times = res[0];
+                    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                    document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[(new Date()).getMonth()]}`;
+
+                    times.forEach((time, ind) => {
+                        const fullDate = new Date(Number(time));
+                        const month = fullDate.getMonth();
+                        const day = fullDate.getDate();
+
+                        //Make sure it's the right month (old ones should be removed, this is just a catch)
+                        if (month == (new Date()).getMonth()) {
+                            if (calList.has(day)) {
+                                var temp = calList.get(day);
+                                temp.push(res[1][ind]);
+                                calList.set(day, temp);
+                            } else {
+                                calList.set(day, [res[1][ind]]);
+                            }
+                        }
+                    });
+
+                    calSetup(calList);
+                }
+
+                xhr2.send();
             }
 
-            xhr2.send();
+            xhrverify.send();
         }
 
 
@@ -670,6 +691,12 @@
 
 
             <div id="cal", class="hide wc" style="margin-top: 20px;">
+                <div id="unauth" class="text-center">
+                    <h1 style="margin-bottom: 20px;">You have to be a premium subscriber to use this feature!</h1>
+                    <h3 style="margin-bottom: 50px;">vvv GET PREMIUM NOW vvv</h3>
+                    <a href="premium.html"><i class="fa-solid fa-crown" style="scale: 4; color: gold;" alt="PREMIUM"></i></a>
+                </div>
+
                 <h1 id="monthName", style="text-align: center; margin-top: 50px; margin-bottom: 25px;"></h1>
                 <form>
                     <table id="spaceId" style="background-color: lightgrey;"
@@ -696,7 +723,7 @@
                             appear as bold and is center aligned-->
                 
                         <thead>
-                            <tr>
+                            <tr id="calForm">
                                 <!-- Here we have applied inline style 
                                     to make it more attractive-->
                                 <th style="color: white; background: purple;">

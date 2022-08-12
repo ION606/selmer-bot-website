@@ -185,6 +185,24 @@ app.get('/.well-known/apple-developer-merchantid-domain-association', async (req
 	return res.sendFile('apple-developer-merchantid-domain-association', { root: '.' });
 });
 
+app.post('/verifypremium', async (req, res) => {
+	if (req.headers.userid) {
+		const id = req.headers.userid;
+
+		connection.then((client) => {
+			const dbo = client.db('main').collection('authorized');
+			dbo.findOne({id: id}).then((doc) => {
+				if (doc != undefined) {
+					res.sendStatus(200);
+				} else {
+					res.sendStatus(401);
+				}
+			}).catch((err) => {
+				console.error(err); return res.sendStatus(500);
+			})
+		});
+	}
+});
 
 app.post('/sendData', async (req, res) => {
 	try {

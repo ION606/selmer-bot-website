@@ -277,7 +277,7 @@
         async function openNewCalWindow(evjs, day) {
             const ev = JSON.parse(evjs);
             
-            await new Promise((res, rej) => { res(window.open('http://www.selmerbot/calEvent.html','popUpWindow','loaction=no,width=600,height=300,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('http://www.selmerbot.com/calEvent.html','popUpWindow','loaction=no,width=600,height=300,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 
@@ -291,7 +291,7 @@
 
 
         async function createCalEvent(day) {
-            await new Promise((res, rej) => { res(window.open('http://www.selmerbot/newCalEvent.html','popUpWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('http://www.selmerbot.com/newCalEvent.html','popUpWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 
@@ -390,7 +390,7 @@
             const id = window.localStorage.getItem('Id').toString();
 
             var xhr2 = new XMLHttpRequest();
-            xhr2.open('get', 'http://www.selmerbot/getCal/', true);
+            xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
             xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
             //Use the guild Id as the userId
@@ -469,7 +469,6 @@
 
     <div id="cal", class="wc" style="margin-top: 20px;">
         <h1 id="monthName", style="text-align: center; margin-top: 50px; margin-bottom: 25px;"></h1>
-        <!-- <button class="helpbtn" onclick="alert('Use {sn} to insert the server name, {un} to insert the user name, and {ut} to insert the user tag\nExample: Welcome to {sn} Sir {un}#{ut}')"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.downloadclipart.net%2Flarge%2F45627-icon-with-question-mark-clipart.png&f=1&nofb=1" style="width: 50px; border-radius: 50%; border-style: solid;"></button> -->
         <form>
             <table id="spaceId" style="background-color: lightgrey;"
                 cellspacing="15" cellpadding="15" class="mx-auto">

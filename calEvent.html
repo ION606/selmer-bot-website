@@ -221,22 +221,33 @@
             window.opener.location.reload();
 
             if (inp.inp == 'cal') {
-                const userId = JSON.parse(window.localStorage.getItem('Id'));
-                const delObjKeys = sessionStorage.getItem('delObjKeys');
-                
-                //Send the data to the server
-                var xhr = new XMLHttpRequest();
-                xhr.open('post', 'http://www.selmerbot.com/sendData/', true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-                xhr.setRequestHeader(`reminders`, true);
-                xhr.setRequestHeader(`delObjKeys`, delObjKeys);
-                
-                xhr.onloadend = (e) => {
-                    console.log(e);
-                    alert("Saved!");
-                    window.close();
-                };
-                xhr.send();
+                // const userId = JSON.parse(window.localStorage.getItem('Id'));
+
+                var xhrsess = new XMLHttpRequest();
+                xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
+
+                xhrsess.onloadend = (e) => {
+                    const sessionData = JSON.parse(xhrsess.response);
+                    const userId = JSON.parse(sessionData.userId);
+                    const delObjKeys = sessionStorage.getItem('delObjKeys');
+                    
+                    //Send the data to the server
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('post', 'http://www.selmerbot.com/sendData/', true);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                    xhr.setRequestHeader(`reminders`, true);
+                    xhr.setRequestHeader(`delObjKeys`, delObjKeys);
+                    
+                    xhr.onloadend = (e) => {
+                        console.log(e);
+                        alert("Saved!");
+                        window.close();
+                    };
+                    xhr.send();
+                }
+                xhrsess.send();
             }
         }
 

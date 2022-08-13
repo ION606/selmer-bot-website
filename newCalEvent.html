@@ -124,6 +124,19 @@
         };
 
 
+        function getSessionData() {
+            var xhrsess = new XMLHttpRequest();
+            xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
+            xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
+
+            //Reminder that this will return a map of strings (you'll have to use JSON.parse() again)
+            xhrsess.onloadend = (e) => {
+                return JSON.parse(xhrsess.response);
+            }
+        }
+
+
         function sendData(event) {
             event.preventDefault();
 
@@ -160,33 +173,37 @@
 
                 const d = new Date(new Date().getFullYear(), new Date().getMonth(), day, hour, minute);
                 const serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
-                const id = window.localStorage.getItem('Id');
-                
-                //Reminder format = { time: 1212122, event: { guildId: "930148608400035860", userId: "12", name: "Some Generic Name", description: "Some description", offset: "15", link: "https://www.example.com" location: "Some location" } }
-                let obj = { time: String(d.getTime() - offsetTS), event: { guildId: serverSettings.Id, userId: id, name: name, description: desc, offset: offset, link: url, location: loc } }
 
-                //Send the data to the server
-                var xhr = new XMLHttpRequest();
-                xhr.open('post', 'http://www.selmerbot.com/newCalEvent/', true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-                xhr.setRequestHeader(`newCalEvent`, JSON.stringify(obj));
-                
-                xhr.onloadend = (e) => {
-                    console.log(xhr.response);
-                    if (xhr.response == "OK") {
-                        //make sure the opened window isn't a popup
-                        if (window.opener.opener == null) { window.opener.location.reload(); }
+                const sessionDataPromise = await getSessionData();
+                sessionDataPromise.then((sessionData) => {
+                    const id = sessionData.userId;
+                    
+                    //Reminder format = { time: 1212122, event: { guildId: "930148608400035860", userId: "12", name: "Some Generic Name", description: "Some description", offset: "15", link: "https://www.example.com" location: "Some location" } }
+                    let obj = { time: String(d.getTime() - offsetTS), event: { guildId: serverSettings.Id, userId: id, name: name, description: desc, offset: offset, link: url, location: loc } }
 
-                        alert("Saved!");
-                        window.close();
-                    } else if (xhr.response == "Internal Server Error") {
-                        alert("Internal Server Error\nPlease try again!");
-                        window.close();
-                    } else if (xhr.response == "Conflict") {
-                        alert("There's already an event at this time!");
-                    }
-                };
-                xhr.send();
+                    //Send the data to the server
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('post', 'http://www.selmerbot.com/newCalEvent/', true);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                    xhr.setRequestHeader(`newCalEvent`, JSON.stringify(obj));
+                    
+                    xhr.onloadend = (e) => {
+                        console.log(xhr.response);
+                        if (xhr.response == "OK") {
+                            //make sure the opened window isn't a popup
+                            if (window.opener.opener == null) { window.opener.location.reload(); }
+
+                            alert("Saved!");
+                            window.close();
+                        } else if (xhr.response == "Internal Server Error") {
+                            alert("Internal Server Error\nPlease try again!");
+                            window.close();
+                        } else if (xhr.response == "Conflict") {
+                            alert("There's already an event at this time!");
+                        }
+                    };
+                    xhr.send();
+                });
 
                 // alert(`${name}, ${desc}, ${url}, ${loc}, ${d}`);
             } catch (err) {

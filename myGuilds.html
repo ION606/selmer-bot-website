@@ -55,77 +55,98 @@
 
 
     <script>
-        window.onload = () => {
-            const guilds = JSON.parse(JSON.parse(window.localStorage.getItem('guilds')));
+        function getSessionData() {
+            return new Promise((resolve, reject) => {
+                var xhrsess = new XMLHttpRequest();
+                xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
 
-            if (!guilds) {
-                alert("Please log in to continue");
-                if (window.location.href.indexOf('localhost') != -1) {
-                    window.location = 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
-                } else {
-                    window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=http%3A%2F%2Fwww.selmerbot.com%2F&response_type=token&scope=identify%20guilds';
-                }
-            }
-
-            var wrapper = document.getElementById('wrapper');
-            
-            var row = document.createElement("servers_row");
-            row.innerHTML = ""; // clear images
-            row.classList.add('serverRow');
-
-            for (let i = 0; i < guilds.length; i++) {
-                //New row every 10 servers
-                if (i % 10 == 0) {
-                    wrapper.appendChild(row);
-                    row.innerHTML = "";
-                    row.classList.add('serverRow');
+                //Reminder that this will return a map of strings (you'll have to use JSON.parse() again)
+                xhrsess.onloadend = (e) => {
+                    resolve(JSON.parse(xhrsess.response));
                 }
 
-                var div = document.createElement("div");
-                var imagem = document.createElement("img");
-                var name = document.createElement("p");
-                name.innerText = guilds[i].name;
-                name.style = "color: white";
+                xhrsess.send();
+            });
+        }
+        
+        window.onload = async () => {
+            //#region GUILDS
+            // const guilds = JSON.parse(JSON.parse(window.localStorage.getItem('guilds')));
 
-                if (guilds[i].icon) {
-                    imagem.src = `https://cdn.discordapp.com/icons/${guilds[i].id}/${guilds[i].icon}.png`;
-                } else {
-                    imagem.src = 'https://github.com/ION606/selmer-bot-website/blob/main/assets/circleOutline.png?raw=true';
-                }
+            //Guilds section
+            const sessionDataPromise = getSessionData();
+            sessionDataPromise.then((sessionData) => {
+                const guilds = JSON.parse(sessionData.guilds);
 
-                if (guilds[i].inServer) {
-                    // imagem.classList.add('serverImgIn');
-                    imagem.className = 'serverImgIn';
-
-                    //OPEN A NEW WINDOW FOR SERVER EDITING
-                    imagem.onclick = function() {
-                        console.log('LOADING.....');
-                        var xhr = new XMLHttpRequest();
-                        xhr.open('post', 'http://www.selmerbot.com/getServer/', true);
-                        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-                        xhr.setRequestHeader('serverNumber', guilds[i].id);
-                        xhr.onloadend = (e) => { window.localStorage.setItem('serverInfo', (xhr.response)); window.location = 'http://www.selmerbot.com/dashboard.html'; }
-                        xhr.send();
+                if (!guilds) {
+                    alert("Please log in to continue");
+                    if (window.location.href.indexOf('localhost') != -1) {
+                        window.location = 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
+                    } else {
+                        window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=http%3A%2F%2Fwww.selmerbot.com%2F&response_type=token&scope=identify%20guilds';
                     }
-                } else {
-                    // imagem.classList.add('serverImgOut');
-                    imagem.className = 'serverImgOut';
-                    imagem.onclick = function() {
-                        window.open('https://discord.com/oauth2/authorize?client_id=926551095352901632&scope=applications.commands+bot&permissions=549755289087');
-                    }//OPEN A NEW WINDOW WITH SERVER INVITE
-
                 }
 
-                div.appendChild(imagem);
-                div.appendChild(name);
+                var wrapper = document.getElementById('wrapper');
+                
+                var row = document.createElement("servers_row");
+                row.innerHTML = ""; // clear images
+                row.classList.add('serverRow');
 
-                div.classList.add('server');
+                for (let i = 0; i < guilds.length; i++) {
+                    //New row every 10 servers
+                    if (i % 10 == 0) {
+                        wrapper.appendChild(row);
+                        row.innerHTML = "";
+                        row.classList.add('serverRow');
+                    }
 
-                row.appendChild(div);
-            }
+                    var div = document.createElement("div");
+                    var imagem = document.createElement("img");
+                    var name = document.createElement("p");
+                    name.innerText = guilds[i].name;
+                    name.style = "color: white";
 
-            wrapper.appendChild(row);
-            wrapper.appendChild(document.createElement('div'));
+                    if (guilds[i].icon) {
+                        imagem.src = `https://cdn.discordapp.com/icons/${guilds[i].id}/${guilds[i].icon}.png`;
+                    } else {
+                        imagem.src = 'https://github.com/ION606/selmer-bot-website/blob/main/assets/circleOutline.png?raw=true';
+                    }
+
+                    if (guilds[i].inServer) {
+                        imagem.className = 'serverImgIn';
+
+                        imagem.onclick = function() {
+                            var xhr = new XMLHttpRequest();
+                            xhr.open('post', 'http://www.selmerbot.com/getServer/', true);
+                            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                            xhr.setRequestHeader('serverNumber', guilds[i].id);
+                            xhr.onloadend = (e) => { window.localStorage.setItem('serverInfo', (xhr.response)); window.location = 'http://www.selmerbot.com/dashboard.html'; }
+                            xhr.send();
+                        }
+                    } else {
+                        // imagem.classList.add('serverImgOut');
+                        imagem.className = 'serverImgOut';
+                        imagem.onclick = function() {
+                            window.open('https://discord.com/oauth2/authorize?client_id=926551095352901632&scope=applications.commands+bot&permissions=549755289087');
+                        }//OPEN A NEW WINDOW WITH SERVER INVITE
+
+                    }
+
+                    div.appendChild(imagem);
+                    div.appendChild(name);
+
+                    div.classList.add('server');
+
+                    row.appendChild(div);
+                }
+
+                wrapper.appendChild(row);
+                wrapper.appendChild(document.createElement('div'));                     
+            });
+            //#endregion
         }
     </script>
 

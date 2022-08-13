@@ -396,15 +396,6 @@
             //Use the guild Id as the userId
             xhrverify.setRequestHeader('userId', id);
             xhrverify.onloadend = (e) => {
-                console.log(xhrverify.response); //WHAT
-                if (xhrverify.response == "Unauthorized") {
-                    document.getElementById("calForm").style.display = "none";
-                    document.getElementById("unauth").style.display = "block";
-                    return;
-                } else if (xhrverify.response == 'Internal Server Error') {
-                    alert("Uh oh, an Internal Server Error has occured!\nPlease try again!");
-                    return window.location.href = "index.html";
-                }
 
                 //Load the channels
                 var xhr = new XMLHttpRequest();
@@ -464,6 +455,19 @@
                 }
                 xhr.send();
 
+
+                //#region Calendar
+                if (xhrverify.response == "Unauthorized") {
+                    document.getElementById("calForm").style.display = "none";
+                    document.getElementById("unauth").style.display = "block";
+                    return;
+                } else if (xhrverify.response == 'Internal Server Error') {
+                    alert("Uh oh, an Internal Server Error has occured!\nPlease try again!");
+                    return window.location.href = "index.html";
+                }
+
+
+
                 var xhr2 = new XMLHttpRequest();
                 xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
                 xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
@@ -499,6 +503,8 @@
                 }
 
                 xhr2.send();
+
+                //#endregion
             }
 
             xhrverify.send();
@@ -507,7 +513,14 @@
 
         function logout() {
             window.localStorage.clear();
-            window.location.href = 'index.html';
+            window.sessionStorage.clear();
+            var xhr = new XMLHttpRequest();
+            xhr.open('post', 'http://www.selmerbot.com/logout/', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xhr.setRequestHeader('sessionid', window.localStorage.getItem('sessionId'));
+
+            xhr.onloadend = (e) => { window.location.href = 'index.html'; }
+            xhr.send();
         }
     </script>
 
@@ -691,7 +704,7 @@
 
 
             <div id="cal", class="hide wc" style="margin-top: 20px;">
-                <div id="unauth" class="text-center">
+                <div id="unauth" class="text-center" style="display: none;">
                     <h1 style="margin-bottom: 20px;">You have to be a premium subscriber to use this feature!</h1>
                     <h3 style="margin-bottom: 50px;">vvv GET PREMIUM NOW vvv</h3>
                     <a href="premium.html"><i class="fa-solid fa-crown" style="scale: 4; color: gold;" alt="PREMIUM"></i></a>

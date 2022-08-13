@@ -181,29 +181,19 @@
 			const fragment = new URLSearchParams(window.location.hash.slice(1));
 			const [accessToken, tokenType, state] = [fragment.get('access_token'), fragment.get('token_type'), fragment.get('state')];
 
-			if (!accessToken && !window.localStorage.getItem('serverInfo')) {
+			if (!accessToken && !window.localStorage.getItem('sessionId')) {
 				const randomString = generateRandomString();
 				localStorage.setItem('oauth-state', randomString);
 				document.getElementById('guildslink').href = '';
 				document.getElementById('guildslink').style = 'cursor: no-drop;';
 
 				// $(".custom-alert").slideUp(0);
-
-				document.getElementById('login').href += `&state=${encodeURIComponent(btoa(randomString))}`;
-				return document.getElementById('login').style.display = 'block';
-			} else if (!accessToken && window.localStorage.getItem('serverInfo')) {
+				// document.getElementById('login').href += `&state=${encodeURIComponent(btoa(randomString))}`;
+				// return document.getElementById('login').style.display = 'block';
+			} else if (!accessToken && window.localStorage.getItem('sessionId')) {
 				//The user is already logged in
 				document.getElementById('loginbtn').style.display = 'none'
 				document.getElementById('logoutbtn').style.display = "block";
-			} else {
-				document.getElementById('alertrow').style = "";
-				$(".custom-alert").slideDown(500);
-
-				window.setTimeout(function() {			
-					$(".custom-alert").slideUp(500, function() {
-						$(this).remove();
-					});
-				}, 5000);
 			}
 
 			if (localStorage.getItem('oauth-state') !== atob(decodeURIComponent(state))) {
@@ -220,7 +210,7 @@
 					// document.getElementById('TEMP').innerText = response.toString();
 					// console.log(response);
 					const { id, username, discriminator } = response;
-					window.localStorage.setItem('Id', id);
+					window.sessionStorage.setItem('Id', id);
 					// console.log(guilds);
 					// document.getElementById('info').innerText += ` ${username}#${discriminator}`;
 
@@ -236,22 +226,35 @@
 				}
 			}).then(response => {
 				response.json().then((result) => {
-					
 					const owned = result.filter((inp) => { return (inp.owner); });
-					// window.localStorage.setItem('guilds', owned);
 
-					// alert('Loading, please hold!\nps - You can close this alert :)');
 					var xhr = new XMLHttpRequest();
 					xhr.open('post', 'http://www.selmerbot.com/user/', true);
 					xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 					xhr.setRequestHeader('guilds', JSON.stringify(owned));
-					xhr.setRequestHeader('userId', window.localStorage.getItem('Id'));
+					xhr.setRequestHeader('userId', window.sessionStorage.getItem('Id'));
 
-					xhr.onloadend = (e) => { window.localStorage.setItem('guilds', (JSON.stringify(xhr.response))); window.location = 'http://www.selmerbot.com/myGuilds.html'; }
+					xhr.onloadend = (e) => {
+						//Maybe have an alert for logged in?
+						window.localStorage.setItem('sessionId', xhr.response);
+						document.getElementById('alertrow').style = "";
+						window.location.href = "index.html";
+
+						//Too far down, user can't see it
+						// $(".custom-alert").slideDown(500);
+
+						// window.setTimeout(function() {			
+						// 	$(".custom-alert").slideUp(500, function() {
+						// 		$(this).remove();
+						// 		window.location.href = "index.html";
+						// 	});
+						// }, 5000);
+					}
+
 					xhr.send(JSON.stringify(owned));
 				}).then((r) => {
 					
-				})
+				});
 			})
 			.catch(console.error);
 		}
@@ -268,9 +271,16 @@
 			}
 		}
 
-		function logout() {
+        function logout() {
             window.localStorage.clear();
-            window.location.href = 'index.html';
+            window.sessionStorage.clear();
+            var xhr = new XMLHttpRequest();
+            xhr.open('post', 'http://www.selmerbot.com/logout/', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xhr.setRequestHeader('sessionid', window.localStorage.getItem('sessionId'));
+
+            xhr.onloadend = (e) => { window.location.href = 'index.html'; }
+            xhr.send();
         }
 	</script>
 
@@ -343,7 +353,7 @@
 	<div class="row custom-alert" style="display: none;" id="alertrow">
 		<div class="alert alert-warning alert-dismissible" id="banner" style="text-align: center" role="alert">
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-			<strong class="mx-auto">Loading Servers...</strong> <!-- This alert box could indicate a successful or positive action. -->
+			<strong class="mx-auto">Logged In Successfully!</strong> <!-- This alert box could indicate a successful or positive action. -->
 		</div>
 	</div>
 	

@@ -371,11 +371,28 @@
                 calSpacing.cellPadding = 1;
             }
 
-            document.getElementById('calHeader').style.display = "block";
+            // document.getElementById('calHeader').style.display = "block"; //Breaks the calendar
         }
     </script>
     
     <script>
+        function getSessionData() {
+            return new Promise((resolve, reject) => {
+                var xhrsess = new XMLHttpRequest();
+                xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
+
+                //Reminder that this will return a map of strings (you'll have to use JSON.parse() again)
+                xhrsess.onloadend = (e) => {
+                    resolve(JSON.parse(xhrsess.response));
+                }
+
+                xhrsess.send();
+            });
+        }
+
+
         window.onload = () => {
             var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
 
@@ -389,7 +406,7 @@
             }
 
             //Get serverId
-            const id = window.localStorage.getItem('Id').toString();
+            const id = serverSettings.Id; // window.localStorage.getItem('Id').toString();
 
             //Check if the user has premium
             var xhrverify = new XMLHttpRequest();

@@ -3,9 +3,11 @@
 // const fetch = require('node-fetch');
 // const btoa = require('btoa');
 // const { clientId, clientSecret, port } = require('./config.json');
-import express from 'express';
+import express from 'express'
 import fetch from 'node-fetch'
 import { MongoClient, ServerApiVersion } from 'mongodb'
+import { v4 as uuidv4 } from 'uuid'
+import { validate as uuidValidate } from 'uuid';
 
 //Bot section (PLACE IN ENV)
 import { Client, Intents } from 'discord.js';
@@ -51,8 +53,8 @@ const app = express();
 // app.use(express.json());
 app.use(express.static('/assets'));
 
-app.post('/user', async(request, response) => {
 
+app.post('/user', async(request, response) => {
 	const guilds = JSON.parse(request.headers.guilds);
 
 	const id = request.headers.userid;
@@ -67,9 +69,42 @@ app.post('/user', async(request, response) => {
 		}
 	}
 
-	return response.send(guilds);
-	return response.sendFile('myGuilds.html', { root: '.' });
-})
+	//Add the guilds to the session data
+	connection.then((client) => {
+		const sessionId = uuidv4();
+
+		const dbo = client.db('main').collection('sessions');
+		dbo.insertOne({ sessionId: sessionId, userId: id, guilds: JSON.stringify(guilds) });
+
+		response.send(sessionId);
+	});
+});
+
+
+app.post('/logout', async (req, res) => {
+	connection.then((client) => {
+		const sessionId = req.headers.sessionid;
+		const dbo = client.db('main').collection('sessions');
+		dbo.deleteOne({ sessionId: sessionId });
+	});
+
+	res.sendStatus(200);
+});
+
+
+app.post('/getSessionInfo', async (req, res) => {
+	const session = req.headers.session;
+	if (session) {
+		if (uuidValidate(session)) {
+			connection.then((client) => {
+				const dbo = client.db('main').collection('sessions');
+				dbo.findOne({ sessionId: session }).then((doc) => {
+					res.send(doc);
+				})
+			})
+		}
+	}
+});
 
 
 app.get('/myGuilds.html', async (req, res) => {
@@ -111,7 +146,7 @@ app.get('/getChannels', async (req, res) => {
 		} else if (type == 'GUILD_VOICE') {
 			arr.voice.push({ name: channel.name, id: channel.id });
 		}
-	})
+	});
 
 	res.send(arr);
 });

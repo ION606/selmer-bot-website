@@ -394,9 +394,9 @@
 
 
         window.onload = () => {
-            var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
+            var sessionId = window.localStorage.getItem('sessionId');
 
-            if (!serverSettings) {
+            if (!sessionId) {
                 alert("Please log in to continue");
                 if (window.location.href.indexOf('localhost') != -1) {
                     window.location = 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
@@ -406,60 +406,63 @@
             }
 
             //Get serverId
-            const id = serverSettings.Id; // window.localStorage.getItem('Id').toString();
-
-            //Check if the user has premium
-            var xhrverify = new XMLHttpRequest();
-            xhrverify.open('post', 'http://www.selmerbot.com/verifypremium/', true);
-            xhrverify.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-
-            //Use the guild Id as the userId
-            xhrverify.setRequestHeader('userId', id);
-            xhrverify.onloadend = (e) => {
-                if (xhrverify.response == "Unauthorized") {
-                    document.getElementById("unauth").style.display = "block";
-                    return;
-                }
-
-                var xhr2 = new XMLHttpRequest();
-                xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
-                xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            // const id = serverSettings.Id; // window.localStorage.getItem('Id').toString();
+            const session = getSessionData();
+            session.then((sessionInfo) => {
+                const id = sessionInfo.userId;
+                //Check if the user has premium
+                var xhrverify = new XMLHttpRequest();
+                xhrverify.open('post', 'http://www.selmerbot.com/verifypremium/', true);
+                xhrverify.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
                 //Use the guild Id as the userId
-                xhr2.setRequestHeader('userId', id);
+                xhrverify.setRequestHeader('userId', id);
+                xhrverify.onloadend = (e) => {
+                    if (xhrverify.response == "Unauthorized") {
+                        document.getElementById("unauth").style.display = "block";
+                        return;
+                    }
 
-                xhr2.onloadend = (e) => {
-                    const calList = new Map();
+                    var xhr2 = new XMLHttpRequest();
+                    xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
+                    xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
-                    const res = JSON.parse(xhr2.response);
-                    const times = res[0];
-                    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                    document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[(new Date()).getMonth()]}`;
+                    //Use the guild Id as the userId
+                    xhr2.setRequestHeader('userId', id);
 
-                    times.forEach((time, ind) => {
-                        const fullDate = new Date(Number(time));
-                        const month = fullDate.getMonth();
-                        const day = fullDate.getDate();
+                    xhr2.onloadend = (e) => {
+                        const calList = new Map();
 
-                        //Make sure it's the right month (old ones should be removed, this is just a catch)
-                        if (month == (new Date()).getMonth()) {
-                            if (calList.has(day)) {
-                                var temp = calList.get(day);
-                                temp.push(res[1][ind]);
-                                calList.set(day, temp);
-                            } else {
-                                calList.set(day, [res[1][ind]]);
+                        const res = JSON.parse(xhr2.response);
+                        const times = res[0];
+                        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                        document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[(new Date()).getMonth()]}`;
+
+                        times.forEach((time, ind) => {
+                            const fullDate = new Date(Number(time));
+                            const month = fullDate.getMonth();
+                            const day = fullDate.getDate();
+
+                            //Make sure it's the right month (old ones should be removed, this is just a catch)
+                            if (month == (new Date()).getMonth()) {
+                                if (calList.has(day)) {
+                                    var temp = calList.get(day);
+                                    temp.push(res[1][ind]);
+                                    calList.set(day, temp);
+                                } else {
+                                    calList.set(day, [res[1][ind]]);
+                                }
                             }
-                        }
-                    });
+                        });
 
-                    calSetup(calList);
+                        calSetup(calList);
+                    }
+
+                    xhr2.send();
                 }
 
-                xhr2.send();
-            }
-
-            xhrverify.send();
+                xhrverify.send();
+            });
         }
     </script>
 </head>

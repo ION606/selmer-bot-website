@@ -226,7 +226,7 @@ app.post('/verifypremium', async (req, res) => {
 
 		connection.then((client) => {
 			const dbo = client.db('main').collection('authorized');
-			dbo.findOne({id: id}).then((doc) => {
+			dbo.findOne({ discordID: id }).then((doc) => {
 				if (doc != undefined) {
 					res.sendStatus(200);
 				} else {

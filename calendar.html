@@ -283,6 +283,7 @@
 
                 w.sessionStorage.setItem("evlist", evjs);
                 w.sessionStorage.setItem('day', day);
+                w.sessionStorage.setItem('ref', 'user');
 
                 w.location.reload();
                 w.document.write('<title>Editing ${(new Date(Number(ev.time)))}</title>');
@@ -296,6 +297,7 @@
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 
                 w.sessionStorage.setItem("day", day);
+                w.sessionStorage.setItem("ref", 'user');
 
                 w.location.reload();
                 // w.document.write('<title>Editing ${(' + String(day) + ')}</title>');

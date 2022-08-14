@@ -125,19 +125,23 @@
 
 
         function getSessionData() {
-            var xhrsess = new XMLHttpRequest();
-            xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
-            xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-            xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
+            return new Promise((resolve, reject) => {
+                var xhrsess = new XMLHttpRequest();
+                xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
 
-            //Reminder that this will return a map of strings (you'll have to use JSON.parse() again)
-            xhrsess.onloadend = (e) => {
-                return JSON.parse(xhrsess.response);
-            }
+                //Reminder that this will return a map of strings (you'll have to use JSON.parse() again)
+                xhrsess.onloadend = (e) => {
+                    resolve(JSON.parse(xhrsess.response));
+                }
+
+                xhrsess.send();
+            });
         }
 
 
-        function sendData(event) {
+        async function sendData(event) {
             event.preventDefault();
 
             try {
@@ -174,12 +178,19 @@
                 const d = new Date(new Date().getFullYear(), new Date().getMonth(), day, hour, minute);
                 const serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
 
-                const sessionDataPromise = await getSessionData();
+                const sessionDataPromise = getSessionData();
                 sessionDataPromise.then((sessionData) => {
-                    const id = sessionData.userId;
-                    
+                    var uid = null;
+                    var gid = null;
+
+                    if (sessionStorage.getItem("ref") == "user") {
+                        uid = sessionData.userId;
+                    } else if (serverSettings != undefined) {
+                        gid = serverSettings.Id;
+                    }
+
                     //Reminder format = { time: 1212122, event: { guildId: "930148608400035860", userId: "12", name: "Some Generic Name", description: "Some description", offset: "15", link: "https://www.example.com" location: "Some location" } }
-                    let obj = { time: String(d.getTime() - offsetTS), event: { guildId: serverSettings.Id, userId: id, name: name, description: desc, offset: offset, link: url, location: loc } }
+                    let obj = { time: String(d.getTime() - offsetTS), event: { guildId: gid, userId: uid, name: name, description: desc, offset: offset, link: url, location: loc } }
 
                     //Send the data to the server
                     var xhr = new XMLHttpRequest();

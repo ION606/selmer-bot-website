@@ -279,6 +279,7 @@
 
                 w.sessionStorage.setItem("evlist", evjs);
                 w.sessionStorage.setItem('day', day);
+                w.sessionStorage.setItem('ref', 'guild');
 
                 w.location.reload();
                 w.document.write('<title>Editing ${(new Date(Number(ev.time)))}</title>');
@@ -294,6 +295,7 @@
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 
                 w.sessionStorage.setItem("day", day);
+                w.sessionStorage.setItem('ref', 'guild');
 
                 w.location.reload();
                 // w.document.write('<title>Editing ${(' + String(day) + ')}</title>');
@@ -472,12 +474,12 @@
                 xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
                 xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
-                xhr2.setRequestHeader('userId', id);
+                xhr2.setRequestHeader('guildId', id);
 
                 xhr2.onloadend = (e) => {
                     const calList = new Map();
 
-                    const res = JSON.parse(xhr2.response);
+                    const res = JSON.parse(xhr2.response); console.log(res, typeof res);
                     const times = res[0];
                     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
                     document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[(new Date()).getMonth()]}`;

@@ -153,24 +153,30 @@ app.get('/getChannels', async (req, res) => {
 
 
 app.get('/getCal', async (req, res) => {
-	const userId = req.headers.userid;
+	const userId = req.headers.userid || false;
+	const guildId = req.headers.guildid || false;
 
 	connection.then((client) => {
 		var times;
 
 		const dbo = client.db('main').collection('reminderKeys');
-		dbo.findOne({ userId: userId }).then((doc) => {
+		dbo.findOne({$or: [ {userId: userId}, {userId: guildId} ]}).then((doc) => {
 			if (!doc) { return res.send([[], []]); }
 			times = doc.times;
 			let tbo = client.db('main').collection('reminders');
 
-			tbo.find({ $where: function() { return (times.indexOf(this.time) != -1 && this.userId == userId); }}).toArray((err, docs) => {
+			// { $where: function() { return (times.indexOf(this.time) != -1 && this.userId == userId); }}
+			// tbo.find({time: {$in: times}}).toArray((err, docs) => { console.log("A", docs); throw 1; });
+			
+			tbo.find({time: {$in: times}}).toArray((err, docs) => {
+
 				//There's gotta be a better way
 				let newdoc = [];
 				for (let i = 0; i < docs.length; i ++) {
 					newdoc.push({});
 					for (let j in docs[i]) {
-						if (docs[i][j].userId == userId) {
+						if (!isNaN(j) && (docs[i][j].userId == userId || docs[i][j].guildId == guildId)) {
+							// console.log(`${docs[i][j].userId} == ${userId}`, `${docs[i][j].guildId} == ${guildId}`);
 							newdoc[i][j] = docs[i][j];
 						}
 					}
@@ -182,7 +188,6 @@ app.get('/getCal', async (req, res) => {
 					//If there's nothing on that date, skip
 					// if (newdoc[i].amt == 0) { console.log(newdoc[i]); }
 				}
-
 				res.send(JSON.stringify([times, newdoc]));
 			});
 		});
@@ -260,12 +265,19 @@ app.post('/sendData', async (req, res) => {
 							// }); return console.log(obj.time);
 							doc.amt --;
 
-							
-							kbo.findOne({ 'userId': doc[obj.eventInd].userId }).then((kdoc) => {
+							// console.log(doc[obj.eventInd]); return;
+							var searchId;
+							if (doc[obj.eventInd].userId != null) {
+								searchId = doc[obj.eventInd].userId;
+							} else if (doc[obj.eventInd].guildId != null) {
+								searchId = doc[obj.eventInd].guildId;
+							}
+
+							kbo.findOne({ 'userId': searchId }).then((kdoc) => {
 								if ((kdoc.times.length - 1) > 0) {
-									kbo.updateOne({ 'userId': doc[obj.eventInd].userId }, {$pull: { times: obj.time }});
+									kbo.updateOne({ 'userId': searchId }, {$pull: { times: obj.time }});
 								} else {
-									kbo.deleteOne({ 'userId': doc[obj.eventInd].userId });
+									kbo.deleteOne({ 'userId': searchId });
 								}
 							});
 
@@ -314,25 +326,30 @@ app.post('/sendData', async (req, res) => {
 //Reminder format = { time: 1212122, event: { guildId: "930148608400035860", userId: "12", name: "Some Generic Name", description: "Some description", offset: "15", link: "https://www.example.com" } }
 app.post('/newCalEvent', async (req, res) => {
 	if (req.headers.newcalevent) {
-		
 		try {
 			const obj = JSON.parse(req.headers.newcalevent);
 			// console.log(obj.time, typeof obj.time); return;
+			var searchId;
+			if (obj.event.userId != null) {
+				searchId = obj.event.userId;
+			} else if (obj.event.guildId != null) {
+				searchId = obj.event.guildId;
+			} else { return res.sendStatus(400); }
 
 			connection.then((client) => {
 				// Update the Key object first to check if the time is already there
 				const kbo = client.db('main').collection('reminderKeys');
-				kbo.findOne(({ 'userId': obj.event.userId })).then((doc) => {
+				kbo.findOne({ 'userId': searchId }).then((doc) => {
 
 					if (doc) {
 						if (doc.times.indexOf(obj.time) == -1) {
-							kbo.updateOne({ 'userId': obj.event.userId }, { $push: { times: obj.time } })
+							kbo.updateOne({ 'userId': searchId }, { $push: { times: obj.time } })
 							.catch((err) => { console.error(err); res.sendStatus(500); });
 						} else {
 							return res.sendStatus(409);
 						}
 					} else {
-						doc = { userId: obj.event.userId, times: [obj.time] }
+						doc = { 'userId': searchId, times: [obj.time] }
 						kbo.insertOne(doc);
 					}
 

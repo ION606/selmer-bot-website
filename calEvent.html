@@ -230,9 +230,12 @@
 
                 xhrsess.onloadend = (e) => {
                     const sessionData = JSON.parse(xhrsess.response);
-                    const userId = JSON.parse(sessionData.userId);
+                    var userId = JSON.parse(sessionData.userId);
                     const delObjKeys = sessionStorage.getItem('delObjKeys');
-                    
+                    if (sessionStorage.getItem('ref') == 'guild') {
+                        userId = serverSettings.Id;
+                    }
+
                     //Send the data to the server
                     var xhr = new XMLHttpRequest();
                     xhr.open('post', 'http://www.selmerbot.com/sendData/', true);

@@ -73,9 +73,6 @@
         
         window.onload = async () => {
             //#region GUILDS
-            // const guilds = JSON.parse(JSON.parse(window.localStorage.getItem('guilds')));
-
-            //Guilds section
             const sessionDataPromise = getSessionData();
             sessionDataPromise.then((sessionData) => {
                 const guilds = JSON.parse(sessionData.guilds);
@@ -120,10 +117,14 @@
 
                         imagem.onclick = function() {
                             var xhr = new XMLHttpRequest();
-                            xhr.open('post', 'http://www.selmerbot.com/getServer/', true);
+                            xhr.open('post', 'http://www.selmerbot.com/setCurrentServer/', true);
                             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                             xhr.setRequestHeader('serverNumber', guilds[i].id);
-                            xhr.onloadend = (e) => { window.localStorage.setItem('serverInfo', (xhr.response)); window.location = 'http://www.selmerbot.com/dashboard.html'; }
+                            xhr.setRequestHeader('sessionid', window.localStorage.getItem("sessionId"));
+                            xhr.onloadend = (e) => {
+                                // window.sessionStorage.setItem('serverInfo', (xhr.response));
+                                window.location = 'http://www.selmerbot.com/dashboard.html';
+                            }
                             xhr.send();
                         }
                     } else {

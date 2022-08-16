@@ -139,6 +139,14 @@
             border-color: #000000;
         }
 
+        .ardpd {
+            color: inherit;
+            background-color: rgba(85, 83, 83, 0.2);
+        }
+        .ardpd:focus-visible {
+            color: white;
+        }
+
     </style>
 
 <!-- Buttons -->
@@ -280,6 +288,7 @@
                 w.sessionStorage.setItem("evlist", evjs);
                 w.sessionStorage.setItem('day', day);
                 w.sessionStorage.setItem('ref', 'guild');
+                w.sessionStorage.setItem('serverInfo', window.sessionStorage.getItem('serverInfo'));
 
                 w.location.reload();
                 w.document.write('<title>Editing ${(new Date(Number(ev.time)))}</title>');
@@ -296,6 +305,7 @@
 
                 w.sessionStorage.setItem("day", day);
                 w.sessionStorage.setItem('ref', 'guild');
+                w.sessionStorage.setItem('serverInfo', window.sessionStorage.getItem('serverInfo'));
 
                 w.location.reload();
                 // w.document.write('<title>Editing ${(' + String(day) + ')}</title>');
@@ -374,154 +384,207 @@
     </script>
 
     <script>
+        function getSessionData() {
+            return new Promise((resolve, reject) => {
+                var xhrsess = new XMLHttpRequest();
+                xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
+
+                //Reminder that this will return a map of strings (you'll have to use JSON.parse() again)
+                xhrsess.onloadend = (e) => {
+                    resolve(JSON.parse(xhrsess.response));
+                }
+
+                xhrsess.send();
+            });
+        }
+
         //Maybe pre-load the channels in the server into local storage for accessing when chosing the welcome/logging channels?
         window.onload = () => {
-            var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
+            const serverInfoPromise = getSessionData();
+            serverInfoPromise.then((sessionInfo) => {
+                const serverInfo = JSON.parse(sessionInfo.currentServer);
+                var serverSettings = JSON.parse(serverInfo.serverSettings);
 
-            if (!serverSettings) {
-                alert("Please log in to continue");
-                if (window.location.href.indexOf('localhost') != -1) {
-                    window.location = 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
-                } else {
-                    window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=http%3A%2F%2Fwww.selmerbot.com%2F&response_type=token&scope=identify%20guilds';
-                }
-            }
-
-            //Get serverId instead of the userId
-            const id = serverSettings.Id;
-
-            //Check if the user has premium
-            var xhrverify = new XMLHttpRequest();
-            xhrverify.open('post', 'http://www.selmerbot.com/verifypremium/', true);
-            xhrverify.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-
-            //Use the guild Id as the userId
-            xhrverify.setRequestHeader('userId', id);
-            xhrverify.onloadend = (e) => {
-
-                //Load the channels
-                var xhr = new XMLHttpRequest();
-                xhr.open('get', `http://www.selmerbot.com/getChannels/`, true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-                xhr.setRequestHeader('serverNumber', id);
-                xhr.onloadend = (e) => {
-                    //Channel Section
-                    const channels = JSON.parse(xhr.response);
-                    // console.log(channels.text);
-                    // window.localStorage.setItem('channels', (xhr.response));
-
-                    for (let i = 0; i < channels.text.length; i ++) {
-                        var channel = channels.text[i];
-                        if (channel.name && channel.id) {
-                            var optlog = document.createElement('option');
-                            optlog.value = channel.id;
-                            optlog.innerHTML = channel.name;
-
-                            //I need two because if I try to append the same one, it only appends to one dorpdown
-                            var optwelcome = document.createElement('option');
-                            optwelcome.value = channel.id;
-                            optwelcome.innerHTML = channel.name;
-
-                            if (serverSettings.WELCOME.welcomechannel == optwelcome.value) {
-                                optwelcome.setAttribute('selected', '');
-                            }
-
-                            if (serverSettings.LOG.logchannel == optlog.value) {
-                                optlog.setAttribute('selected', '');
-                                // optlog.selected = serverSettings.LOG.logchannel;
-                            }
-                            
-
-                            document.getElementById('logchanneldropdown').appendChild(optlog);
-                            document.getElementById('welcomechanneldropdown').appendChild(optwelcome);
-                        }
+                if (!serverSettings) {
+                    alert("Please log in to continue");
+                    if (window.location.href.indexOf('localhost') != -1) {
+                        window.location = 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
+                    } else {
+                        window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=http%3A%2F%2Fwww.selmerbot.com%2F&response_type=token&scope=identify%20guilds';
                     }
-                    
-                    // document.getElementById('body').classList.replace('hide', 'show');
-                    
-                    //Welcome section
-                    let wc = serverSettings.WELCOME.welcomechannel || '';
-                    let wm = serverSettings.WELCOME.welcomemessage || '';
-                    // document.getElementById('wc').setAttribute('value', wc);
-                    document.getElementById('wm').setAttribute('value', wm);
-
-                    //Logging section ,"LOG":{"_id":"LOG","keepLogs":false,"logchannel":null,"severity":0}}
-                    let kl = serverSettings.LOG.keepLogs || false;
-                    let lc = serverSettings.LOG.logchannel || '';
-                    let ls = serverSettings.LOG.severity || 0;
-
-                    document.getElementById('kl').checked = kl;
-                    // document.getElementById('lc').setAttribute('value', lc);
-
-                    // document.getElementById('ls').children[ls].checked = true; //Doesn't work
-                }
-                xhr.send();
-
-
-                //#region Calendar
-                if (xhrverify.response == "Unauthorized") {
-                    document.getElementById("calForm").style.display = "none";
-                    document.getElementById("unauth").style.display = "block";
-                    return;
-                } else if (xhrverify.response == 'Internal Server Error') {
-                    alert("Uh oh, an Internal Server Error has occured!\nPlease try again!");
-                    return window.location.href = "index.html";
                 }
 
+                //Get serverId instead of the userId
+                const id = serverInfo.Id;
 
+                //Check if the user has premium
+                var xhrverify = new XMLHttpRequest();
+                xhrverify.open('post', 'http://www.selmerbot.com/verifypremium/', true);
+                xhrverify.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
-                var xhr2 = new XMLHttpRequest();
-                xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
-                xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                //Use the guild Id as the userId
+                xhrverify.setRequestHeader('userId', id);
+                xhrverify.onloadend = (e) => {
 
-                xhr2.setRequestHeader('guildId', id);
+                    // //Load the channels
+                    // var xhr = new XMLHttpRequest();
+                    // xhr.open('get', `http://www.selmerbot.com/getChannels/`, true);
+                    // xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                    // xhr.setRequestHeader('serverNumber', id);
+                    // xhr.onloadend = (e) => {
+                        
+                        //Channel Section
+                        const channels = JSON.parse(serverInfo.channels);
+                        const roles = JSON.parse(serverInfo.roles);
+                        // console.log(channels.text);
+                        // window.localStorage.setItem('channels', (xhr.response));
 
-                xhr2.onloadend = (e) => {
-                    const calList = new Map();
+                        for (let i = 0; i < channels.text.length; i ++) {
+                            var channel = channels.text[i];
+                            if (channel.name && channel.id) {
+                                var optlog = document.createElement('option');
+                                optlog.value = channel.id;
+                                optlog.innerHTML = channel.name;
 
-                    const res = JSON.parse(xhr2.response); console.log(res, typeof res);
-                    const times = res[0];
-                    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                    document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[(new Date()).getMonth()]}`;
+                                //I need two because if I try to append the same one, it only appends to one dorpdown
+                                var optwelcome = document.createElement('option');
+                                optwelcome.value = channel.id;
+                                optwelcome.innerHTML = channel.name;
 
-                    times.forEach((time, ind) => {
-                        const fullDate = new Date(Number(time));
-                        const month = fullDate.getMonth();
-                        const day = fullDate.getDate();
+                                var optann = document.createElement('option');
+                                optann.value = channel.id;
+                                optann.innerHTML = channel.name;
 
-                        //Make sure it's the right month (old ones should be removed, this is just a catch)
-                        if (month == (new Date()).getMonth()) {
-                            if (calList.has(day)) {
-                                var temp = calList.get(day);
-                                temp.push(res[1][ind]);
-                                calList.set(day, temp);
-                            } else {
-                                calList.set(day, [res[1][ind]]);
+                                if (serverSettings.WELCOME.welcomechannel == optwelcome.value) {
+                                    optwelcome.setAttribute('selected', '');
+                                }
+
+                                if (serverSettings.LOG.logchannel == optlog.value) {
+                                    optlog.setAttribute('selected', '');
+                                    // optlog.selected = serverSettings.LOG.logchannel;
+                                }
+
+                                if (serverSettings.announcement.channel == optann.value) {
+                                    optann.setAttribute('selected', '');
+                                }
+                                
+
+                                document.getElementById('logchanneldropdown').appendChild(optlog);
+                                document.getElementById('welcomechanneldropdown').appendChild(optwelcome);
+                                document.getElementById('achanneldropdown').appendChild(optann);
                             }
                         }
-                    });
+                        
+                        const ard = document.getElementById('aroledropdown');
+                        roles.forEach((role) => {
+                            var opt = document.createElement('option');
+                            opt.value = role.Id;
+                            opt.innerHTML = role.name;
+                            // opt.style += `background-color: ${role.color + '33'};`;
+                            
+                            if (role.color == '#000000') { 
+                                opt.style = 'color: white';
+                            }
+                            else { 
+                                opt.style = `color: ${role.color}; background-color: ${role.color + '33'};`;
+                            }
 
-                    calSetup(calList);
+                            if (serverSettings.announcement.role == role.Id) {
+                                opt.setAttribute('selected', '');
+                            }
+                            ard.appendChild(opt);
+                        });
+
+                        // document.getElementById('body').classList.replace('hide', 'show');
+                        
+                        //Welcome section
+                        let wc = serverSettings.WELCOME.welcomechannel || '';
+                        let wm = serverSettings.WELCOME.welcomemessage || '';
+                        // document.getElementById('wc').setAttribute('value', wc);
+                        document.getElementById('wm').setAttribute('value', wm);
+
+                        //Logging section ,"LOG":{"_id":"LOG","keepLogs":false,"logchannel":null,"severity":0}}
+                        let kl = serverSettings.LOG.keepLogs || false;
+                        let lc = serverSettings.LOG.logchannel || '';
+                        let ls = serverSettings.LOG.severity || 0;
+
+                        document.getElementById('kl').checked = kl;
+                        // document.getElementById('lc').setAttribute('value', lc);
+
+                        // document.getElementById('ls').children[ls].checked = true; //Doesn't work
+                    // }
+                    // xhr.send();
+
+
+                    //#region Calendar
+                    if (xhrverify.response == "Unauthorized") {
+                        document.getElementById("calForm").style.display = "none";
+                        document.getElementById("unauth").style.display = "block";
+                        return;
+                    } else if (xhrverify.response == 'Internal Server Error') {
+                        alert("Uh oh, an Internal Server Error has occured!\nPlease try again!");
+                        return window.location.href = "index.html";
+                    }
+
+
+
+                    var xhr2 = new XMLHttpRequest();
+                    xhr2.open('get', 'http://www.selmerbot.com/getCal/', true);
+                    xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+
+                    xhr2.setRequestHeader('guildId', id);
+
+                    xhr2.onloadend = (e) => {
+                        const calList = new Map();
+
+                        const res = JSON.parse(xhr2.response); console.log(res, typeof res);
+                        const times = res[0];
+                        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                        document.getElementById('monthName').innerText = `Editing Reminders for the Month of ${monthNames[(new Date()).getMonth()]}`;
+
+                        times.forEach((time, ind) => {
+                            const fullDate = new Date(Number(time));
+                            const month = fullDate.getMonth();
+                            const day = fullDate.getDate();
+
+                            //Make sure it's the right month (old ones should be removed, this is just a catch)
+                            if (month == (new Date()).getMonth()) {
+                                if (calList.has(day)) {
+                                    var temp = calList.get(day);
+                                    temp.push(res[1][ind]);
+                                    calList.set(day, temp);
+                                } else {
+                                    calList.set(day, [res[1][ind]]);
+                                }
+                            }
+                        });
+
+                        calSetup(calList);
+                    }
+
+                    xhr2.send();
+
+                    //#endregion
                 }
 
-                xhr2.send();
-
-                //#endregion
-            }
-
-            xhrverify.send();
+                xhrverify.send();
+            });
         }
 
 
         function logout() {
-            window.localStorage.clear();
-            window.sessionStorage.clear();
             var xhr = new XMLHttpRequest();
             xhr.open('post', 'http://www.selmerbot.com/logout/', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('sessionid', window.localStorage.getItem('sessionId'));
 
-            xhr.onloadend = (e) => { window.location.href = 'index.html'; }
+            xhr.onloadend = (e) => {
+                window.localStorage.clear();
+                window.sessionStorage.clear();
+                window.location.href = 'index.html';
+            }
             xhr.send();
         }
     </script>
@@ -561,47 +624,67 @@
             b.classList.replace('saved', 'saving');
             b.innerText = 'SAVING';
 
-            var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
+            const sessionInfoPromise = getSessionData();
+            sessionInfoPromise.then((sessionInfo) => {
+                var serverInfo = JSON.parse(sessionInfo.currentServer);
+                // var serverInfo = JSON.parse(window.sessionStorage.getItem('serverInfo'));
+                var serverSettings = JSON.parse(serverInfo.serverSettings);
 
-            if (inp.inp == 'logs') {
-                const ls = document.getElementsByName('ls');
-                var sevname = '';
-                for (i in ls) {
-                    if (ls[i].checked) { sevname = ls[i].id.substring(3); }
-                }
+                if (inp.inp == 'logs') {
+                    const ls = document.getElementsByName('ls');
+                    var sevname = '';
+                    for (i in ls) {
+                        if (ls[i].checked) { sevname = ls[i].id.substring(3); }
+                    }
 
-                const sevlist = ['none', 'low', 'meduim', 'high']
-                serverSettings.LOG.severity = sevlist.indexOf(sevname);
-                serverSettings.LOG.logchannel = document.getElementById('logchanneldropdown').value || null;
+                    const sevlist = ['none', 'low', 'meduim', 'high']
+                    serverSettings.LOG.severity = sevlist.indexOf(sevname);
+                    serverSettings.LOG.logchannel = document.getElementById('logchanneldropdown').value || null;
 
-                let kl = false;
-                if (document.getElementById('kl').checked) {
-                    kl = true;
-                }
-                serverSettings.LOG.keepLogs = kl;
-            } else {
-                serverSettings.WELCOME.welcomechannel =  document.getElementById('welcomechanneldropdown').value || null;
-                serverSettings.WELCOME.welcomemessage = document.getElementById('wm').value || null;
-            }
-
-            //Send the data to the server
-            var xhr = new XMLHttpRequest();
-            xhr.open('post', 'http://www.selmerbot.com/sendData/', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-            xhr.setRequestHeader('serverSettings', JSON.stringify(serverSettings));
-
-            xhr.onloadend = (e) => {
-                if (xhr.response == 'DONE') {
-                    b.classList.replace('saving', 'saved');
-                    b.innerText = 'SAVED';
-                    window.localStorage.setItem('serverInfo', JSON.stringify(serverSettings));
+                    let kl = false;
+                    if (document.getElementById('kl').checked) {
+                        kl = true;
+                    }
+                    serverSettings.LOG.keepLogs = kl;
+                } else if (inp.inp == 'announcement') {
+                    serverSettings.announcement.channel = document.getElementById('achanneldropdown').value || null;
+                    serverSettings.announcement.role = document.getElementById('aroledropdown').value || null;
+                    console.log(serverSettings.announcement);
                 } else {
-                    b.classList.replace('saving', 'failed');
-                    b.innerText = 'FAILED';
+                    serverSettings.WELCOME.welcomechannel =  document.getElementById('welcomechanneldropdown').value || null;
+                    serverSettings.WELCOME.welcomemessage = document.getElementById('wm').value || null;
                 }
-            }
-            
-            xhr.send(JSON.stringify(serverSettings));
+
+                //Send the data to the server
+                var xhr = new XMLHttpRequest();
+                xhr.open('post', 'http://www.selmerbot.com/sendData/', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                xhr.setRequestHeader('serverSettings', JSON.stringify(serverSettings));
+
+                xhr.onloadend = (e) => {
+                    if (xhr.response == 'DONE') {
+                        //Change the current server data
+                        var xhrs = new XMLHttpRequest();
+                        xhrs.open('post', 'http://www.selmerbot.com/setCurrentServer/', true);
+                        xhrs.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                        xhrs.setRequestHeader('serverNumber', serverInfo.Id);
+                        xhrs.setRequestHeader('sessionid', window.localStorage.getItem("sessionId"));
+                        xhrs.onloadend = (e) => {
+                            if (xhrs.response != 'OK') { alert("Uh Oh! There's been a problem!\nError Code: " + xhrs.response); }
+                            b.classList.replace('saving', 'saved');
+                            b.innerText = 'SAVED';
+                            window.sessionStorage.setItem('serverInfo', JSON.stringify(serverSettings));
+                            window.location.reload();
+                        }
+                        xhrs.send();
+                    } else {
+                        b.classList.replace('saving', 'failed');
+                        b.innerText = 'FAILED';
+                    }
+                }
+                
+                xhr.send(JSON.stringify(serverSettings));
+            });
         }
     </script>
 </head>
@@ -761,8 +844,19 @@
                         <tbody id="calbody" style="color: black;">
 
                         </tbody>
-                    </table>
-                    <!-- <input type="submit" value="Submit", class="submitButton" onclick="sendData(event, { 'inp': 'cal' })"> -->
+                    </table><br><br>
+
+                    <label for="ardpd" style="margin-top: 30px;">Select your event ping role</label>
+                    <select id="aroledropdown" name="ardpd" class="form-select mb-5 ardpd" aria-label="Default select example">
+                        <option selected=""></option>
+                    </select>
+
+                    <label class="ps-1" for="acd">Event Channel Name:</label>
+                    <select id="achanneldropdown" name="acd" class="form-select mb-5">
+                        <option selected=""></option>
+                    </select>
+                    
+                    <input type="submit" value="Submit", class="submitButton" onclick="sendData(event, { 'inp': 'announcement' })">
                 </form>
             </div>
 

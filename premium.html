@@ -163,14 +163,16 @@
         }
 
         function logout() {
-            window.localStorage.clear();
-            window.sessionStorage.clear();
             var xhr = new XMLHttpRequest();
             xhr.open('post', 'http://www.selmerbot.com/logout/', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('sessionid', window.localStorage.getItem('sessionId'));
 
-            xhr.onloadend = (e) => { window.location.href = 'index.html'; }
+            xhr.onloadend = (e) => {
+                window.localStorage.clear();
+                window.sessionStorage.clear();
+                window.location.href = 'index.html';
+            }
             xhr.send();
         }
 

@@ -152,7 +152,7 @@
                     link.innerText = ev.link;
                     link.onclick = function(event) { event.preventDefault(); window.open(ev.link, '_blank'); }
 
-                    const timeFull = new Date(Number(evlist[ind].time) + (Number(ev.offset) + 1) * 60000);
+                    const timeFull = new Date(Number(evlist[ind].time) + (Number(ev.offset)) * 60000);
                     var time = [timeFull.getHours().toString(), timeFull.getMinutes().toString()];
 
                     //Make sure it looks like 01:08 and not 1:8
@@ -217,12 +217,10 @@
         function sendData(event, inp) {
             event.preventDefault();
 
-            var serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
+            var serverSettings = JSON.parse(window.sessionStorage.getItem('serverInfo'));
             window.opener.location.reload();
 
             if (inp.inp == 'cal') {
-                // const userId = JSON.parse(window.localStorage.getItem('Id'));
-
                 var xhrsess = new XMLHttpRequest();
                 xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
                 xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');

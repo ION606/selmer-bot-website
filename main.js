@@ -74,7 +74,7 @@ app.post('/user', async(request, response) => {
 		const sessionId = uuidv4();
 
 		const dbo = client.db('main').collection('sessions');
-		dbo.insertOne({ sessionId: sessionId, userId: id, guilds: JSON.stringify(guilds) });
+		dbo.insertOne({ sessionId: sessionId, userId: id, guilds: JSON.stringify(guilds), currentServer: null });
 
 		response.send(sessionId);
 	});
@@ -149,6 +149,66 @@ app.get('/getChannels', async (req, res) => {
 	});
 
 	res.send(arr);
+});
+
+
+app.get('/temp.html', async (req, res) => { return res.sendFile('temp.html', { root: '.' }); });
+
+//Headers: servernumber, sessionid
+app.post('/setCurrentServer', async (req, res) => {
+	try {
+		const id = req.headers.servernumber;
+
+		if (id) {
+			const obj = {};
+			const arr = {text: [], voice: []};
+			const guild = bot.guilds.cache.get(id);
+
+			const roles = [];
+			guild.roles.cache.filter((role) => { return(!role.managed) }).forEach((role) => {
+				let newObj = {};
+				newObj.Id = role.id;
+				newObj.name = role.name;
+				newObj.color = role.hexColor;
+				
+				roles.push(newObj);
+			});
+
+			const channels = guild.channels.cache;
+			channels.forEach((channel) => {
+				const type = channel.type;
+				if (type == 'GUILD_TEXT') {
+					arr.text.push({ name: channel.name, id: channel.id });
+				} else if (type == 'GUILD_VOICE') {
+					arr.voice.push({ name: channel.name, id: channel.id });
+				}
+			});
+
+			connection.then((client) => {
+				const dbo = client.db(id).collection('SETUP');
+				dbo.find().toArray(async (err, docs) => {
+					const m = new Map();
+					m.set('Id', id);
+
+					await Promise.all(docs.map(async (doc) => {
+						m.set(doc._id, doc);
+					})).then(() => {
+						obj['Id'] = id;
+						obj['roles'] = JSON.stringify(roles);
+						obj['channels'] = JSON.stringify(arr);
+						obj['serverSettings'] = JSON.stringify(Object.fromEntries(m));
+						
+						const dbo = client.db('main').collection('sessions');
+						dbo.updateOne({ sessionId: req.headers.sessionid }, {$set: { currentServer: JSON.stringify(obj) }});
+						res.sendStatus(200);
+					});
+				})
+			});
+		}
+	} catch (err) {
+		console.error(err);
+		res.sendStatus(500);
+	}
 });
 
 
@@ -310,6 +370,7 @@ app.post('/sendData', async (req, res) => {
 
 				await dbo.updateOne({ _id: 'WELCOME' }, {$set: { welcomechannel: pref.WELCOME.welcomechannel, welcomemessage: pref.WELCOME.welcomemessage }});
 				await dbo.updateOne({ _id: 'LOG' }, {$set: { keepLogs: pref.LOG.keepLogs, logchannel: pref.LOG.logchannel, severity: pref.LOG.severity }});
+				await dbo.updateOne({ _id: 'announcement' }, {$set: { channel: pref.announcement.channel, role: pref.announcement.role }});
 			}).then(() => { res.send("DONE"); })
 			.catch((err) => {
 				console.error(err);

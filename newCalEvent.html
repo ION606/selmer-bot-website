@@ -176,7 +176,7 @@
                 const offsetTS = offset * 60000;
 
                 const d = new Date(new Date().getFullYear(), new Date().getMonth(), day, hour, minute);
-                const serverSettings = JSON.parse(window.localStorage.getItem('serverInfo'));
+                const serverSettings = JSON.parse(window.sessionStorage.getItem('serverInfo'));
 
                 const sessionDataPromise = getSessionData();
                 sessionDataPromise.then((sessionData) => {

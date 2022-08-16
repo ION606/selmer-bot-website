@@ -152,7 +152,7 @@ app.get('/getChannels', async (req, res) => {
 });
 
 
-app.get('/temp.html', async (req, res) => { return res.sendFile('temp.html', { root: '.' }); });
+// app.get('/temp.html', async (req, res) => { return res.sendFile('temp.html', { root: '.' }); });
 
 //Headers: servernumber, sessionid
 app.post('/setCurrentServer', async (req, res) => {

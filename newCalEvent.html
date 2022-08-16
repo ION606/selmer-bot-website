@@ -203,6 +203,10 @@
                         if (xhr.response == "OK") {
                             //make sure the opened window isn't a popup
                             if (window.opener.opener == null) { window.opener.location.reload(); }
+                            else {
+                                window.opener.opener.location.reload();
+                                window.opener.location.reload();
+                            }
 
                             alert("Saved!");
                             window.close();

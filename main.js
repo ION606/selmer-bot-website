@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { validate as uuidValidate } from 'uuid';
 
 //Bot section (PLACE IN ENV)
-import { Client, Intents } from 'discord.js';
+import { Client, Intents, MessageEmbed } from 'discord.js';
 const token = process.env.token;
 const clientId = process.env.clientId;
 const clientSecret = process.env.clientSecret;
@@ -36,6 +36,7 @@ const bot = new Client({
     partials: [ 'CHANNEL' ]
 });
 
+bot.home_server = process.env.home_server;
 bot.on('ready', async () => {console.log('BOT RUNNING'); });
 bot.login(token);
 
@@ -277,8 +278,59 @@ app.get('/newCalEvent.html', async (req, res) => {
 
 app.get('/calendar.html', async (req, res) => {
 	return res.sendFile('calendar.html', { root: '.' });
+});
+
+app.get('/team', async (req, res) => {
+	return res.sendFile("team.html", { root: '.' });
 })
 
+app.post("/suggestion", async (req, res)=> {
+	if (req.headers.sessionid == 'null') {
+		return res.sendStatus(401);
+	}
+	
+	const suggestion = req.headers.suggestion;
+	if (suggestion) {
+		connection.then((client) => {
+			const dbo = client.db("main").collection("sessions");
+			dbo.findOne({ "sessionId": req.headers.sessionid }).then((doc) => {
+
+				if (!doc) {
+					return res.sendStatus(410);
+				}
+
+				const discId = doc.userId;
+				const user = bot.users.cache.get(discId);
+
+				const channel = bot.guilds.cache.get(bot.home_server).channels.cache.get('944330760146534492');
+				const embd = new MessageEmbed()
+				
+				//If the bot doesn't have the user, just put the id in
+				var uid, icon;
+				if(!user) {
+					uid = `<@${discId}>`;
+					icon = 'https://github.com/ION606/selmer-bot-website/blob/main/assets/circleOutline.png?raw=true';
+				} else {
+					uid = `${user.username}#${user.discriminator}`;
+					icon = user.displayAvatarURL();
+				}
+
+				embd.setAuthor({ name: `${uid}`, url: "", iconURL: icon });
+				embd.setTitle(`Selmer Bot Suggestion`);
+
+				embd.setColor("ORANGE")
+				.setTimestamp()
+				.setDescription(suggestion)
+				.setThumbnail('https://github.com/ION606/selmer-bot-website/blob/main/assets/suggestion.png?raw=true')
+				.setFooter({ text: 'This suggestion came from the Selmer Bot Website suggestion box'});
+
+				channel.send({ embeds: [embd] })
+
+				res.sendStatus(200);
+			});
+		});
+	}
+})
 
 //Stripe stuff
 app.get('/.well-known/apple-developer-merchantid-domain-association', async (req, res) => {

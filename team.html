@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="shortcut icon" href="https://github.com/ION606/selmer-bot-website/blob/main/assets/favicon.ico?raw=true" type="image/x-icon">
+	<script src="https://kit.fontawesome.com/728e740903.js" crossorigin="anonymous"></script>
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300&display=swap" rel="stylesheet">
+	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <title>Selmer Bot Directory</title>
+
+    <style>
+        body {
+            /* background-color: black; */
+            /* background-image: linear-gradient(140deg, #EADEDB 0%, #BC70A4 50%, #BFD641 75%); */
+            background-image: linear-gradient(140deg, #4a12e4 10%, #13206d 50%, #41d6d6 75%);
+            background-repeat:no-repeat;
+            background-size: 100vw 100vh;
+        }
+
+        .webBtn {
+            margin: 50px;
+            font-family:'Comic Sans MS';
+            font-size:20px;
+            line-height:20px;
+            color:#ffffff;
+            background-color:#4d4d4d;
+            padding:20px;
+            border-radius:10px;
+        }
+
+        .webBtn:hover {
+            color: #000000;
+            background-color: #9b9999;
+        }
+
+        .loginbtn {
+            margin-top: 14px;
+            scale: 1.2;
+			border-radius: 10%;
+		}
+		.loginbtn:hover {
+			color: #377aea;
+		}
+
+		.tooltip {
+			position: relative;
+			display: inline-block;
+			cursor: default;
+		}
+
+		.tooltip .tooltiptext {
+			visibility: hidden;
+			padding: 0.25em 0.5em;
+			background-color: black;
+			color: #fff;
+			text-align: center;
+			border-radius: 0.25em;
+			white-space: nowrap;
+			
+			/* Position the tooltip */
+			position: absolute;
+			z-index: 1;
+			top: 100%;
+			left: 100%;
+			transition-property: visibility;
+			transition-delay: 0s;
+		}
+
+		.tooltip:hover .tooltiptext {
+			visibility: visible;
+			transition-delay: 0.3s;
+		}
+
+		nav {
+			/* background-color: rgb(0, 0, 0); */
+            background: linear-gradient(0deg, #06075f00 10%, #13206d 50%, #41d6d6 95%);
+			/* color: blue; */
+			/* text-align: center; */
+		}
+
+		.navbar .nav-item {
+			margin-right: 25px;
+			margin-left: 25px;
+		}
+
+        #right {
+            float: right;
+            margin-right: 50px;
+        }
+
+		.logoutbtn {
+            margin-top: 14px;
+            scale: 1.2;
+			border-radius: 10%;
+			/* float: right; */
+        }
+
+        .logoutbtn:hover {
+            cursor: pointer;
+            color: red;
+        }
+
+        .headerText {
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        h1 {
+            color: rgb(150, 148, 148);
+            -webkit-text-stroke-width: 0.3px;
+            -webkit-text-stroke-color: white;
+        }
+
+        /* h3 {
+            margin-right: 20%;
+            margin-left: 20%;
+            color: white;
+            text-align: center;
+            line-height: 40px;
+        } */
+
+        .abtme {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.212);
+            margin-right: 20%;
+            margin-left: 20%;
+            margin-top: 20px;;
+            color: white;
+            text-align: center;
+            line-height: 40px;
+        }
+
+        .inpbox {
+            width: 250px;
+            height: 100px;
+            border-radius: 20px;
+            background-color: rgb(200, 200, 202);
+        }
+
+        .sbtn {
+            margin: 20px;
+            color: #ffffff;
+			background: linear-gradient(0deg, #5f060600 10%, #6d1335 50%, #d64141 95%);
+			background: linear-gradient(0deg, #d64141 10%, #6d1335 50%, #5f060600 95%);
+			font-size: 19px;
+			border: 1px solid #2d63c8;
+			border-radius: 30px;
+			padding: 15px 50px;
+			cursor: pointer;
+        }
+    </style>
+
+    <script>
+        /*
+            Get the sessionId and the suggestion, send it to the back end where you can get the userId and attach it to the suggestion,
+            then send all that to the selmer-bot ideas channel in the RPI Directory and Emojibase server
+        */
+        function sendData(event) {
+            event.preventDefault();
+
+            const sid = window.localStorage.getItem('sessionId');
+            // if (!sid) {
+            //     return alert("Please log in to send feedback!");
+            // }
+
+            const sbox = document.getElementById("sugbx");
+            if (!sbox.value) { return; }
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('post', 'http://localhost:53134/suggestion/', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xhr.setRequestHeader('sessionId', sid);
+            xhr.setRequestHeader('suggestion', sbox.value);
+
+            xhr.onloadend = (e) => {
+                if (xhr.response == 'OK') {
+                    sbox.value = "Thank you for your suggestion, it has been recorded!";
+                    sbox.disabled = true;
+                    document.getElementById('sb').disabled = true;
+                }
+            }
+
+            xhr.send();
+        }
+    </script>
+</head>
+<body>
+    	<!-- Nav Bar -->
+	<nav class="navbar navbar-expand-sm navbar-fixed-top">
+		<div class="container-fluid mx-auto">
+			<a class="navbar-brand" href="index.html">
+				<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Selmer-icon.png?raw=true" alt="Selmer Icon" style="width: 50px;">
+			</a>
+			
+			<!-- <li class="nav-item">
+				<a href="index.html" style="color: white" class="nav-link"><i class="fa-solid fa-house-chimney", alt="Home" style="scale: 2;"></i></a>
+			</li> -->
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a href="myGuilds.html" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+				</li>
+                
+                <li class="nav-item">
+                    <a href="calendar.html" id="callink" class="nav-link"><i class="fa-solid fa-calendar" alt="Calendar" style="scale: 2; color: lightgrey;"></i></a>
+                </li>
+
+				<li class="nav-item">
+					<a href="https://github.com/ION606/selmerBot/wiki" target="_blank" class="nav-link"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
+				</li>
+				
+				<li class="nav-item">
+					<a href="premium.html" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
+				</li>
+
+				<li class="nav-item">
+					<a href="team" class="nav-link"><i class="fa-solid fa-user-gear" style="scale: 2; color: rgb(12, 216, 5);" alt="AUTHOR"></i></a>
+				</li>
+			</ul>
+		
+		<!-- <button type="button" class="btn btn-primary" data-bs-toggle="tooltip" title="Hooray!">Hover over me!</button> -->
+			<div class="container headerText"><h1>Selmer Bot Web Dashboard</h1></div>
+			<!-- <span class="ms-auto" style="margin-right: 1%;">
+				< !-- <button id="login" class="loginbtn" onclick="window.location = getAPIRedirect()">Log Into Dashboard</button> -- >
+				<button onclick="logout()" id="logoutbtn" class="logoutbtn" style="display: none;"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log Out"></i></button>
+				<button onclick="window.location = getAPIRedirect()" id="loginbtn" class="loginbtn"><i class="fa-solid fa-arrow-right-from-bracket" alt="Log In"></i></button>
+			</span> -->
+		</div>
+	</nav>
+
+    <div style="text-align: center;">
+        <h1>Selmer Bot is being created by ION606!</h1>
+
+        <h3 style="text-align: center;" class="abtme">
+            Hello there, and welcome to the Selmer Bot Web Dashboard! I'm ION606 and I'm a sophomore in college for a Computer Science and an Information Technology dual major.
+            I like creating bots and programming new things! Feel free to suggest new features in the suggestion box (coming soon)!
+        </h3>
+
+        <h1 style="margin-top: 30px;">Find me here!</h1>
+    </div>
+    
+
+    <div class="row">
+        <div style="text-align: center;">
+            <button onclick="window.open('http://www.selmerbot.com/', target='_blank')" class="webBtn">selmerbot.com</button>
+            <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="ion606" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff"></script>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top:50px;">
+        <h1 style="color:rgb(240, 235, 235)"><u>Selmer Bot Feature Suggestion</u></h1>
+
+        <form action="/suggestion" method="post">
+            <textarea type="text" class="inpbox" id="sugbx"></textarea>
+        </form>
+        <button onclick="sendData(event)" class="sbtn" id="sb">Submit</button>
+    </div>
+
+    <div style="text-align: center; position: absolute; bottom: 5px; color: white;">Copyright @ION606 2022</div>
+</body>
+</html>

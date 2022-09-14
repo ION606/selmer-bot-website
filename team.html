@@ -172,9 +172,9 @@
             event.preventDefault();
 
             const sid = window.localStorage.getItem('sessionId');
-            // if (!sid) {
-            //     return alert("Please log in to send feedback!");
-            // }
+            if (!sid) {
+                return alert("Please log in to send feedback!");
+            }
 
             const sbox = document.getElementById("sugbx");
             if (!sbox.value) { return; }

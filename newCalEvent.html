@@ -127,7 +127,7 @@
         function getSessionData() {
             return new Promise((resolve, reject) => {
                 var xhrsess = new XMLHttpRequest();
-                xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.open('post', 'https://www.selmerbot.com/getSessionInfo/', true);
                 xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
 
@@ -194,7 +194,7 @@
 
                     //Send the data to the server
                     var xhr = new XMLHttpRequest();
-                    xhr.open('post', 'http://www.selmerbot.com/newCalEvent/', true);
+                    xhr.open('post', 'https://www.selmerbot.com/newCalEvent/', true);
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                     xhr.setRequestHeader(`newCalEvent`, JSON.stringify(obj));
                     

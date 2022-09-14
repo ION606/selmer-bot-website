@@ -519,7 +519,7 @@ app.get('/', async ({ query }, response) => {
 					client_secret: clientSecret,
 					code,
 					grant_type: 'authorization_code',
-					redirect_uri: `http://www.selmerbot.com/`,
+					redirect_uri: `https://www.selmerbot.com/`,
 					scope: 'identify',
 				}),
 				headers: {

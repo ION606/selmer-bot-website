@@ -222,7 +222,7 @@
 
             if (inp.inp == 'cal') {
                 var xhrsess = new XMLHttpRequest();
-                xhrsess.open('post', 'http://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.open('post', 'https://www.selmerbot.com/getSessionInfo/', true);
                 xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
 
@@ -236,7 +236,7 @@
 
                     //Send the data to the server
                     var xhr = new XMLHttpRequest();
-                    xhr.open('post', 'http://www.selmerbot.com/sendData/', true);
+                    xhr.open('post', 'https://www.selmerbot.com/sendData/', true);
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                     xhr.setRequestHeader(`reminders`, true);
                     xhr.setRequestHeader(`delObjKeys`, delObjKeys);
@@ -255,7 +255,7 @@
         async function createCalEvent(day) {
             // event.preventDefault();
 
-            await new Promise((res, rej) => { res(window.open('http://www.selmerbot.com/newCalEvent.html','newCalPopWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/newCalEvent.html','newCalPopWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { alert("Your browser has JavaScript Disabled!"); return w.close(); }
 

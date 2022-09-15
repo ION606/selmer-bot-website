@@ -686,6 +686,16 @@
                 xhr.send(JSON.stringify(serverSettings));
             });
         }
+
+
+        function createDropDown(sect) {
+            if (sect == 'welcome') {
+                $("#alertWelcome").slideDown(500);
+            } else if (sect == 'logs') {
+                $("#alertLogs").slideDown(500);
+            }
+            console.log(sect);
+        }
     </script>
 </head>
 
@@ -726,6 +736,22 @@
         </div>
     </nav>
 
+    <div id="help_alerts">
+        <div class="row custom-alert" style="display: none;" id="alertWelcome">
+            <div class="alert alert-warning alert-dismissible" id="banner" style="text-align: center" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <!--<strong class="mx-auto"></strong> -->Use {sn} to insert the server name, {un} to insert the user name, and {ut} to insert the user tag<br><i>Example: Welcome to {sn} Sir {un}#{ut}</i>
+            </div>
+        </div>
+
+        <div class="row custom-alert" style="display: none;" id="alertLogs">
+            <div class="alert alert-warning alert-dismissible" id="banner" style="text-align: center" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <!-- <strong class="mx-auto">Logged In Successfully!</strong> -->When setting the log severity, setting the tier will also include all higher tiers<br><i>For example, using !setup log_severity none will log things from every severity</i>
+            </div>
+        </div>
+    </div>
+
     <div class="statusdiv">
         <h2 style="color: white; margin-bottom: 10px; margin-top: 10px;">STATUS</h2>
         <div id="savstat" class="box saved">SAVED</div>
@@ -744,7 +770,7 @@
 
         <div id="inputs">
             <div id="welcome", class="hide wc" style="margin-top: 20px;">
-                <button class="helpbtn" onclick="alert('Use {sn} to insert the server name, {un} to insert the user name, and {ut} to insert the user tag\nExample: Welcome to {sn} Sir {un}#{ut}')"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.downloadclipart.net%2Flarge%2F45627-icon-with-question-mark-clipart.png&f=1&nofb=1" style="width: 50px; border-radius: 50%; border-style: solid;"></button>
+                <button id="whbtn" class="helpbtn" onclick="createDropDown('welcome')"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.downloadclipart.net%2Flarge%2F45627-icon-with-question-mark-clipart.png&f=1&nofb=1" style="width: 50px; border-radius: 50%; border-style: solid;"></button>
                 <form>
                     <label for="wc">Welcome Channel Name:</label>
 
@@ -761,7 +787,7 @@
 
 
             <div id="log", class="hide lg">
-                <button class="helpbtn" onclick="alert('When setting the log severity, setting the tier will also include all higher tiers\nFor example, using !setup log_severity none will log things from every severity')"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.downloadclipart.net%2Flarge%2F45627-icon-with-question-mark-clipart.png&f=1&nofb=1" style="width: 50px; border-radius: 50%; border-style: solid;"></button>
+                <button class="helpbtn" onclick="createDropDown('logs')"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.downloadclipart.net%2Flarge%2F45627-icon-with-question-mark-clipart.png&f=1&nofb=1" style="width: 50px; border-radius: 50%; border-style: solid;"></button>
                 <form>
                     <label for="kl">Keep Logs?</label>
                     <input type="checkbox" id="kl" name="kl"><br><br>

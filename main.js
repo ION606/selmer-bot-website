@@ -74,8 +74,14 @@ app.post('/user', async(request, response) => {
 	connection.then((client) => {
 		const sessionId = uuidv4();
 
+		//Used for database clearing
+		const d = new Date();
+		d.setHours(0);
+		d.setMinutes(0);
+		d.setSeconds(0);
+
 		const dbo = client.db('main').collection('sessions');
-		dbo.insertOne({ sessionId: sessionId, userId: id, guilds: JSON.stringify(guilds), currentServer: null });
+		dbo.insertOne({ sessionId: sessionId, userId: id, guilds: JSON.stringify(guilds), currentServer: null, timeStamp: d.getTime() });
 
 		response.send(sessionId);
 	});

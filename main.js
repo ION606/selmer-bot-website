@@ -9,7 +9,7 @@ import { MongoClient, ServerApiVersion } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 import { validate as uuidValidate } from 'uuid';
 import bodyParser from 'body-parser'
-import formidable from 'formidable';
+// import formidable from 'formidable'; //Heroku doesn't recognize this
 
 //Bot section (PLACE IN ENV)
 import { Client, Intents, MessageEmbed } from 'discord.js';

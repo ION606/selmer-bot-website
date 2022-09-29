@@ -269,6 +269,20 @@
             background-color: rgb(129, 129, 129);
         }
 
+        .uploadLabel {
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 7px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: rgb(13, 179, 179);
+            scale: 1.5;
+            margin-top: 50px;
+        }
+
+        .uploadButton {
+            display: none;
+        }
     </style>
 
 
@@ -432,6 +446,17 @@
                     //Use the guild Id as the userId
                     xhr2.setRequestHeader('userId', id);
 
+                    // //import ics file
+                    // const form = document.createElement("span");
+                    // const label = document.createElement("label");
+                    // label.innerText = "Upload File";
+                    // label.className = "inpBtn";
+                    // document.getElementsByTagName("body")[0].appendChild(label);
+                    // const uploadICS = document.createElement('input');
+                    // uploadICS.type = "file";
+                    // form.appendChild(uploadICS);
+                    // document.getElementsByTagName("body")[0].appendChild(form);
+
                     xhr2.onloadend = (e) => {
                         const calList = new Map();
 
@@ -488,7 +513,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="https://selmer-bot.gitbook.io/selmer-bot-wiki/" target="_blank" class="nav-link"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
+                    <a href="https://docs.selmerbot.com" target="_blank" class="nav-link"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
                 </li>
                 
                 <li class="nav-item">
@@ -523,6 +548,7 @@
                     <a href="premium.html"><i class="fa-solid fa-crown" style="scale: 4; color: gold;" alt="PREMIUM"></i></a>
                 </div>
 
+                
                 <thead>
                     <tr id="calHeader" style="display: none;">
                         <th style="color: white; background: purple;">
@@ -547,6 +573,5 @@
                 </tbody>
             </table>
         </form>
-    </div>
 </body>
 </html>

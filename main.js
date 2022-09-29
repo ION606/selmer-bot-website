@@ -8,6 +8,8 @@ import fetch from 'node-fetch'
 import { MongoClient, ServerApiVersion } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 import { validate as uuidValidate } from 'uuid';
+import bodyParser from 'body-parser'
+import formidable from 'formidable';
 
 //Bot section (PLACE IN ENV)
 import { Client, Intents, MessageEmbed } from 'discord.js';
@@ -53,6 +55,7 @@ async function getJSONResponse(body) {
 const app = express();
 // app.use(express.json());
 app.use(express.static('/assets'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 app.post('/user', async(request, response) => {
@@ -511,6 +514,26 @@ app.post('/newCalEvent', async (req, res) => {
 	}
 });
 
+
+/*
+app.post("/newics", async(req, res) => {
+	var fileupload = req.body.filetoupload;
+    var form =  new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files){
+    	 var oldpath = files.fileupload.path;
+         var newpath = "C:/Users/itama_za9au7b/Downloads/SBFiles/"+files.fileupload.name;
+         fs.rename(oldpath, newpath, function(err){
+         	if(err) {
+         		console.log(err);
+				res.sendStatus(500);
+			} else{
+                res.write("File Uploaded");
+                res.sendStatus(200);
+            }
+         }); 
+    });
+});
+*/
 
 
 app.get('/', async ({ query }, response) => {

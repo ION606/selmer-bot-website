@@ -117,11 +117,6 @@ app.post('/getSessionInfo', async (req, res) => {
 });
 
 
-app.get('/myGuilds.html', async (req, res) => {
-	return res.sendFile('myGuilds.html', { root: '.' });
-});
-
-
 app.post('/getServer', async (req, res) => {
 	const id = req.headers.servernumber;
 	
@@ -161,8 +156,6 @@ app.get('/getChannels', async (req, res) => {
 	res.send(arr);
 });
 
-
-// app.get('/temp.html', async (req, res) => { return res.sendFile('temp.html', { root: '.' }); });
 
 //Headers: servernumber, sessionid
 app.post('/setCurrentServer', async (req, res) => {
@@ -264,34 +257,44 @@ app.get('/getCal', async (req, res) => {
 	})
 });
 
-app.get('/dashboard.html', async (req, res) => {
-	return res.sendFile('dashboard.html', { root: '.' });
+
+//#region HTML gile serving
+
+app.get('/myGuilds', async (req, res) => {
+	return res.sendFile('myGuilds.html', { root: 'HTML' });
 });
 
 
-app.get('/premium.html', async (req, res) => {
-	return res.sendFile('premium.html', { root: '.' });
+app.get('/dashboard', async (req, res) => {
+	return res.sendFile('dashboard.html', { root: 'HTML' });
 });
 
-app.get('/index.html', async (req, res) => {
-	return res.sendFile('index.html', { root: '.' });
+
+app.get('/premium', async (req, res) => {
+	return res.sendFile('premium.html', { root: 'HTML' });
 });
 
-app.get('/calEvent.html', async (req, res) => {
-	return res.sendFile('calEvent.html', { root: '.' });
+app.get('/index', async (req, res) => {
+	return res.sendFile('index.html', { root: 'HTML' });
 });
 
-app.get('/newCalEvent.html', async (req, res) => {
-	return res.sendFile('newCalEvent.html', { root: '.' });
+app.get('/calEvent', async (req, res) => {
+	return res.sendFile('calEvent.html', { root: 'HTML' });
 });
 
-app.get('/calendar.html', async (req, res) => {
-	return res.sendFile('calendar.html', { root: '.' });
+app.get('/newCalEvent', async (req, res) => {
+	return res.sendFile('newCalEvent.html', { root: 'HTML' });
+});
+
+app.get('/calendar', async (req, res) => {
+	return res.sendFile('calendar.html', { root: 'HTML' });
 });
 
 app.get('/team', async (req, res) => {
-	return res.sendFile("team.html", { root: '.' });
+	return res.sendFile("team.html", { root: 'HTML' });
 })
+
+//#endregion
 
 app.post("/suggestion", async (req, res)=> {
 	if (req.headers.sessionid == 'null') {
@@ -565,12 +568,12 @@ app.get('/', async ({ query }, response) => {
 		}
 	}
 
-	return response.sendFile('index.html', { root: '.' });
+	return response.sendFile('index.html', { root: 'HTML' });
 });
 
 
 app.get("*",(req,res) => {
-    res.sendFile("404.html", {root: '.'});
+    res.sendFile("404.html", {root: 'HTML'});
 })
 
 app.listen(port, () => console.log(`App listening on port ${port}`));

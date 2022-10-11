@@ -251,7 +251,7 @@
 						window.localStorage.setItem('sessionId', xhr.response);
 						
 						document.getElementById('alertrow').style = "";
-						window.location.href = "index.html";
+						window.location.href = "/";
 
 						//Too far down, user can't see it
 						// $(".custom-alert").slideDown(500);
@@ -293,7 +293,7 @@
             xhr.onloadend = (e) => {
 				window.localStorage.clear();
             	window.sessionStorage.clear();
-				window.location.href = 'index.html';
+				window.location.href = '/';
 			}
             xhr.send();
         }
@@ -315,7 +315,7 @@
 	<!-- Nav Bar -->
 	<nav class="navbar navbar-expand-sm navbar-fixed-top">
 		<div class="container-fluid mx-auto">
-			<a class="navbar-brand" href="index.html">
+			<a class="navbar-brand" href="/">
 				<img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Selmer-icon.png?raw=true" alt="Selmer Icon" style="width: 50px;">
 			</a>
 			
@@ -324,11 +324,11 @@
 			</li> -->
 			<ul class="navbar-nav">
 				<li class="nav-item">
-					<a href="myGuilds.html" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+					<a href="myGuilds" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
 				</li>
                 
                 <li class="nav-item">
-                    <a href="calendar.html" id="callink" class="nav-link"><i class="fa-solid fa-calendar" alt="Calendar" style="scale: 2; color: lightgrey;"></i></a>
+                    <a href="calendar" id="callink" class="nav-link"><i class="fa-solid fa-calendar" alt="Calendar" style="scale: 2; color: lightgrey;"></i></a>
                 </li>
 
 				<li class="nav-item">
@@ -336,7 +336,7 @@
 				</li>
 				
 				<li class="nav-item">
-					<a href="premium.html" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
+					<a href="premium" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
 				</li>
 
 				<li class="nav-item">

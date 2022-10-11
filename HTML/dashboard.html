@@ -525,7 +525,7 @@
                         return;
                     } else if (xhrverify.response == 'Internal Server Error') {
                         alert("Uh oh, an Internal Server Error has occured!\nPlease try again!");
-                        return window.location.href = "index.html";
+                        return window.location.href = "/";
                     }
 
 
@@ -583,7 +583,7 @@
             xhr.onloadend = (e) => {
                 window.localStorage.clear();
                 window.sessionStorage.clear();
-                window.location.href = 'index.html';
+                window.location.href = '/';
             }
             xhr.send();
         }
@@ -702,17 +702,17 @@
 <body>
     <nav class="navbar navbar-expand-sm navbar-fixed-top">
         <div class="container-fluid mx-auto">
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" href="/">
                 <img src="https://github.com/ION606/selmer-bot-website/blob/main/assets/Selmer-icon.png?raw=true" alt="Selmer Icon" style="width: 50px;">
             </a>
             
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a href="myGuilds.html" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
+                    <a href="myGuilds" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
                 </li>
                 
                 <li class="nav-item">
-                    <a href="calendar.html" id="callink" class="nav-link"><i class="fa-solid fa-calendar" alt="Calendar" style="scale: 2; color: lightgrey;"></i></a>
+                    <a href="calendar" id="callink" class="nav-link"><i class="fa-solid fa-calendar" alt="Calendar" style="scale: 2; color: lightgrey;"></i></a>
                 </li>
 
                 <li class="nav-item">
@@ -720,7 +720,7 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a href="premium.html" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
+                    <a href="premium" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
                 </li>
                 
                 <li class="nav-item">
@@ -822,7 +822,7 @@
                 <div id="unauth" class="text-center" style="display: none;">
                     <h1 style="margin-bottom: 20px;">You have to be a premium subscriber to use this feature!</h1>
                     <h3 style="margin-bottom: 50px;">vvv GET PREMIUM NOW vvv</h3>
-                    <a href="premium.html"><i class="fa-solid fa-crown" style="scale: 4; color: gold;" alt="PREMIUM"></i></a>
+                    <a href="premium"><i class="fa-solid fa-crown" style="scale: 4; color: gold;" alt="PREMIUM"></i></a>
                 </div>
 
                 <h1 id="monthName", style="text-align: center; margin-top: 50px; margin-bottom: 25px;"></h1>

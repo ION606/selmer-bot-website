@@ -55,6 +55,7 @@ async function getJSONResponse(body) {
 const app = express();
 // app.use(express.json());
 app.use(express.static('/assets'));
+app.use('/CSS', express.static('./CSS'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
@@ -292,6 +293,15 @@ app.get('/calendar', async (req, res) => {
 
 app.get('/team', async (req, res) => {
 	return res.sendFile("team.html", { root: 'HTML' });
+})
+
+//#endregion
+
+
+//#region INCLUDES
+
+app.get('/cal.css', async (req, res) => {
+	return res.sendFile('cal.css', { root: 'CSS' });
 })
 
 //#endregion

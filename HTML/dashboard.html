@@ -281,7 +281,7 @@
         async function openNewCalWindow(evjs, day) {
             const ev = JSON.parse(evjs);
             
-            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/calEvent.html','popUpWindow','loaction=no,width=600,height=300,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/calEvent','popUpWindow','loaction=no,width=600,height=300,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 
@@ -299,7 +299,7 @@
 
 
         async function createCalEvent(day) {
-            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/newCalEvent.html','popUpWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/newCalEvent','popUpWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 

@@ -255,7 +255,7 @@
         async function createCalEvent(day) {
             // event.preventDefault();
 
-            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/newCalEvent.html','newCalPopWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/newCalEvent','newCalPopWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { alert("Your browser has JavaScript Disabled!"); return w.close(); }
 

@@ -52,10 +52,69 @@ async function getJSONResponse(body) {
 	return JSON.parse(fullBody);
 }
 
+
+async function setCurrentServer(sid, id) {
+	return new Promise((resolve, reject) => {
+		try {
+			if (id) {
+				const obj = {};
+				const arr = {text: [], voice: []};
+				const guild = bot.guilds.cache.get(id);
+
+				const roles = [];
+				guild.roles.cache.filter((role) => { return(!role.managed) }).forEach((role) => {
+					let newObj = {};
+					newObj.Id = role.id;
+					newObj.name = role.name;
+					newObj.color = role.hexColor;
+					
+					roles.push(newObj);
+				});
+
+				const channels = guild.channels.cache;
+				channels.forEach((channel) => {
+					const type = channel.type;
+					if (type == 'GUILD_TEXT') {
+						arr.text.push({ name: channel.name, id: channel.id });
+					} else if (type == 'GUILD_VOICE') {
+						arr.voice.push({ name: channel.name, id: channel.id });
+					}
+				});
+
+				connection.then((client) => {
+					const dbo = client.db(id).collection('SETUP');
+					dbo.find().toArray(async (err, docs) => {
+						const m = new Map();
+						m.set('Id', id);
+
+						await Promise.all(docs.map(async (doc) => {
+							m.set(doc._id, doc);
+						})).then(() => {
+							obj['Id'] = id;
+							obj['roles'] = JSON.stringify(roles);
+							obj['channels'] = JSON.stringify(arr);
+							obj['serverSettings'] = JSON.stringify(Object.fromEntries(m));
+							
+							const dbo = client.db('main').collection('sessions');
+							dbo.updateOne({ sessionId: sid }, {$set: { currentServer: JSON.stringify(obj) }});
+							resolve(200);
+						});
+					})
+				});
+			}
+		} catch (err) {
+			reject(err);
+		}
+	});
+}
+
+
+
 const app = express();
 // app.use(express.json());
 app.use(express.static('/assets'));
 app.use('/CSS', express.static('./CSS'));
+app.use('/scripts', express.static('./scripts'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
@@ -160,59 +219,12 @@ app.get('/getChannels', async (req, res) => {
 
 //Headers: servernumber, sessionid
 app.post('/setCurrentServer', async (req, res) => {
-	try {
-		const id = req.headers.servernumber;
-
-		if (id) {
-			const obj = {};
-			const arr = {text: [], voice: []};
-			const guild = bot.guilds.cache.get(id);
-
-			const roles = [];
-			guild.roles.cache.filter((role) => { return(!role.managed) }).forEach((role) => {
-				let newObj = {};
-				newObj.Id = role.id;
-				newObj.name = role.name;
-				newObj.color = role.hexColor;
-				
-				roles.push(newObj);
-			});
-
-			const channels = guild.channels.cache;
-			channels.forEach((channel) => {
-				const type = channel.type;
-				if (type == 'GUILD_TEXT') {
-					arr.text.push({ name: channel.name, id: channel.id });
-				} else if (type == 'GUILD_VOICE') {
-					arr.voice.push({ name: channel.name, id: channel.id });
-				}
-			});
-
-			connection.then((client) => {
-				const dbo = client.db(id).collection('SETUP');
-				dbo.find().toArray(async (err, docs) => {
-					const m = new Map();
-					m.set('Id', id);
-
-					await Promise.all(docs.map(async (doc) => {
-						m.set(doc._id, doc);
-					})).then(() => {
-						obj['Id'] = id;
-						obj['roles'] = JSON.stringify(roles);
-						obj['channels'] = JSON.stringify(arr);
-						obj['serverSettings'] = JSON.stringify(Object.fromEntries(m));
-						
-						const dbo = client.db('main').collection('sessions');
-						dbo.updateOne({ sessionId: req.headers.sessionid }, {$set: { currentServer: JSON.stringify(obj) }});
-						res.sendStatus(200);
-					});
-				})
-			});
-		}
-	} catch (err) {
+	setCurrentServer().then((code) => {
+		res.sendStatus(code);
+	}).catch((err) => {
 		console.error(err);
 		res.sendStatus(500);
-	}
+	});
 });
 
 
@@ -293,7 +305,37 @@ app.get('/calendar', async (req, res) => {
 
 app.get('/team', async (req, res) => {
 	return res.sendFile("team.html", { root: 'HTML' });
-})
+});
+
+app.get('/joinedGuild', async (req, res) => {
+	res.sendFile('joinedGuild.html', { root: 'HTML' });
+});
+
+app.post('/joinedGuild', async (req, res) => {
+	// res.sendFile('joinedGuild.html', { root: 'HTML' });
+	const { headers } = req;
+	const { servernumber, sessionid } = headers;
+
+	connection.then((client) => {
+		const dbo = client.db('main').collection('sessions');
+		dbo.find().toArray((err, docs) => {
+			const guilds = JSON.parse(docs[0].guilds);
+
+			try {
+				for (let i = 0; i < guilds.length; i++) {
+					if (guilds[i].id == servernumber) {
+						guilds[i].inServer = true;
+						setCurrentServer(sessionid, servernumber);
+						return res.sendStatus(200);
+					}
+				}
+			} catch (err) {
+				console.log(err);
+				res.sendStatus(500);
+			}
+		});
+	});
+});
 
 //#endregion
 

@@ -58,7 +58,8 @@
         function getSessionData() {
             return new Promise((resolve, reject) => {
                 var xhrsess = new XMLHttpRequest();
-                xhrsess.open('post', 'https://www.selmerbot.com/getSessionInfo/', true);
+                // xhrsess.open('post', 'https://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.open('post', 'http://localhost:53134/getSessionInfo/', true);
                 xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
 
@@ -131,7 +132,14 @@
                         // imagem.classList.add('serverImgOut');
                         imagem.className = 'serverImgOut';
                         imagem.onclick = function() {
-                            window.open('https://discord.com/oauth2/authorize?client_id=926551095352901632&scope=applications.commands+bot&permissions=549755289087');
+                            var url;
+                            //Open a new window with the invite. Once the invite is processed, send request to the server to update the db (toggle inServer to true?)
+                            if (window.location.href.indexOf('localhost') != -1) {
+                                url = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&permissions=549755289087&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2FjoinedGuild&response_type=code&scope=rpc%20bot%20applications.commands'
+                            } else {
+                                url = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&permissions=549755289087&redirect_uri=https%3A%2F%2Fwww.selmerbot.com%2FjoinedGuild&scope=bot%20applications.commands'
+                            }
+                            window.open(url);
                         }//OPEN A NEW WINDOW WITH SERVER INVITE
 
                     }

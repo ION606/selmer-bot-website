@@ -58,8 +58,8 @@
         function getSessionData() {
             return new Promise((resolve, reject) => {
                 var xhrsess = new XMLHttpRequest();
-                // xhrsess.open('post', 'https://www.selmerbot.com/getSessionInfo/', true);
-                xhrsess.open('post', 'http://localhost:53134/getSessionInfo/', true);
+                xhrsess.open('post', 'https://www.selmerbot.com/getSessionInfo/', true);
+                // xhrsess.open('post', 'http://localhost:53134/getSessionInfo/', true);
                 xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
 

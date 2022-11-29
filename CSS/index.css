@@ -1,10 +1,15 @@
 *{
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
     box-sizing: border-box;
 }
 
-html { width:100%; height:100%; margin:0; padding:0; }
+html { 
+    width:100%; 
+    height:100%; 
+    margin:0; 
+    padding:0; 
+}
 
 body {
     background-color: rgb(41, 42, 48);
@@ -85,7 +90,6 @@ body {
     margin-bottom: 100px;
     background: #faf9f9;
     border:1px solid rgb(94, 104, 104);
-    
 }
 
 .carousel-control.right,
@@ -121,8 +125,7 @@ body {
 }
 
 
-.wrapper {
-    width: 1170px;
+.main-header {
     margin: 0 auto;
     background-color: black;
     height: 100px;
@@ -134,16 +137,45 @@ body {
 
 
 
-
-
 header{
     text-align: center;
 }
 
+.brand-name {
+
+    /* class for band name: should be centered wherever it is */
+    text-align: center;
+
+    /* heading elements like h1 all have margins: let the margins be 0 */
+    margin: 0; 
+
+    font-size: 1em;
+
+    /* changing the everything tag's font set on the heading to be different  */
+    font-family: Rajdhani, sans-serif, poppins;
+
+    /*
+    Since heading are by default bolded, the font-weight can be changed to 
+    normalize the bolded text
+    */
+    font-weight: normal;
+
+    /* All band names should be white */
+    color: white;
+}
+
+.band-name-large {
+    font-size: 2em;
+}
+
+
 .logo{
-    width: 30%;
+    width: 50%;
     float: left;
     line-height: 100px;
+    display: flex;
+    align-items: center;
+    margin-left: 5%
 }
 
 .logo a{
@@ -168,6 +200,13 @@ nav a{
     color: #fff;
 }
 
+.navigation{
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+    width: 100%;
+}
+
 .banner-area{
     width: 100%;
     height: 500px;
@@ -189,6 +228,8 @@ nav a{
 
 .content-area {
     width: 100%;
+    height: auto;
+    margin-top: 100px;
     position: relative;
     top: 450px;
     background-color: rgb(41, 42, 48);
@@ -206,6 +247,3 @@ footer{
     background-color: rgb(41, 42, 48);
 }
 
-@media (min-width: 768px) {
-
-}

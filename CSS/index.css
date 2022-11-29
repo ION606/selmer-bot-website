@@ -1,3 +1,4 @@
+/* General styles for the page */
 *{
     margin: 0px;
     padding: 0px;
@@ -17,6 +18,11 @@ body {
     height:100%; margin:0; padding:0;
 }
 
+
+
+
+/* Better Scroll Bar */
+
 body::-webkit-scrollbar {
     width: .5rem
 }
@@ -29,6 +35,197 @@ body::-webkit-scrollbar-thumb {
     background-color: rgb(60,60,60);
     border-radius: 10px;
 }
+
+
+
+
+/* header portion */
+.main-header {
+    margin: 0 auto;
+    background-color: black;
+    height: 100px;
+    width: 100%;
+    z-index: 12;
+    position: fixed;
+    top: 0;
+}
+
+
+header{
+    text-align: center;
+}
+
+.brand-name {
+
+    /* class for band name: should be centered wherever it is */
+    text-align: center;
+
+    /* heading elements like h1 all have margins: let the margins be 0 */
+    margin: 0; 
+
+    font-size: 1em;
+
+    /* changing the everything tag's font set on the heading to be different  */
+    font-family: Rajdhani, sans-serif, poppins;
+
+    /*
+    Since heading are by default bolded, the font-weight can be changed to 
+    normalize the bolded text
+    */
+    font-weight: normal;
+
+    /* All band names should be white */
+    color: white;
+}
+
+.band-name-large {
+    font-size: 2em;
+}
+
+
+.logo{
+    width: 50%;
+    float: left;
+    line-height: 100px;
+    display: flex;
+    align-items: center;
+    margin-left: 5%
+}
+
+.logo a{
+    text-decoration: none;
+    font-size: 30px;
+    font-family: poppins, sans-serif;
+    color: #fff;
+    letter-spacing: 5px;
+}
+
+
+.navigation{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+    width: 100%;
+}
+
+.toggle-button{
+	position: absolute;
+	top: 3rem;
+	right: 3rem;
+	display: none;
+	flex-direction: column;
+	justify-content: space-between;
+	width: 30px;
+	height: 22px;
+}
+
+.toggle-button .bar {
+	height: 3px;
+	width: 100%;
+	background-color: white;
+	border-radius: 10px;
+}
+
+
+@media (max-width: 1350px){
+	.toggle-button {
+		display: flex;
+	}
+	.navbar-links {
+		display: none;
+		width: 100%;
+	}
+
+	.navbar {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.navbar-links ul{
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.navbar-links li {
+		border-top: 1px solid rgba(255, 255, 255, .3);
+		text-align: center;
+	}
+
+	.navbar-links li a {
+		padding: 0.5rem 1rem;
+	}
+
+	.navbar-links.active {
+		display: flex;
+	}
+}
+
+
+.navbar-links li{
+	list-style: none;
+}
+
+.navbar-links li a {
+	text-decoration: none;
+	color: #fff;
+	padding: 2rem;
+	display: block;
+}
+
+.navbar-links li:hover {
+	background-color: rgba(255, 255, 255, 0.5)
+}
+
+
+.navbar-links ul{
+	margin:0;
+	padding:0;
+	display: flex;
+}
+
+.banner-area{
+    width: 100%;
+    height: 500px;
+    position: fixed;
+    top: 100px;
+    background-image: url('https://github.com/ION606/selmer-bot-website/blob/main/assets/Header%20BK.gif?raw=true');  
+    background-size: cover; 
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.banner-area h2 {
+    padding: 8%;
+    font-size: 70px;
+    font-family: sans-serif, poppins;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.content-area {
+    width: 100%;
+    height: auto;
+    margin-top: 100px;
+    position: relative;
+    top: 450px;
+    background-color: rgb(41, 42, 48);
+}
+
+footer{
+    background-color: rgb(41, 42, 48);
+}
+
+.footer-area {
+    padding-top: 30px;
+    width: 100%;
+    position: relative;
+    top: 450px;
+    background-color: rgb(41, 42, 48);
+}
+
+
+
+/* I have no clue */
 
 .loginbtn {
     margin-top: 14px;
@@ -137,126 +334,4 @@ body::-webkit-scrollbar-thumb {
     position: relative;
 }
 
-
-.main-header {
-    margin: 0 auto;
-    background-color: black;
-    height: 100px;
-    width: 100%;
-    z-index: 12;
-    position: fixed;
-    top: 0;
-}
-
-
-
-header{
-    text-align: center;
-}
-
-.brand-name {
-
-    /* class for band name: should be centered wherever it is */
-    text-align: center;
-
-    /* heading elements like h1 all have margins: let the margins be 0 */
-    margin: 0; 
-
-    font-size: 1em;
-
-    /* changing the everything tag's font set on the heading to be different  */
-    font-family: Rajdhani, sans-serif, poppins;
-
-    /*
-    Since heading are by default bolded, the font-weight can be changed to 
-    normalize the bolded text
-    */
-    font-weight: normal;
-
-    /* All band names should be white */
-    color: white;
-}
-
-.band-name-large {
-    font-size: 2em;
-}
-
-
-.logo{
-    width: 50%;
-    float: left;
-    line-height: 100px;
-    display: flex;
-    align-items: center;
-    margin-left: 5%
-}
-
-.logo a{
-    text-decoration: none;
-    font-size: 30px;
-    font-family: poppins, sans-serif;
-    color: #fff;
-    letter-spacing: 5px;
-}
-
-nav{
-    float: right; 
-    line-height: 100px;
-}
-
-nav a{
-    text-decoration: none;
-    font-family: poppins, sans-serif;
-    letter-spacing: 4px;
-    font-size: 20px;
-    margin: 0 10px;
-    color: #fff;
-}
-
-.navigation{
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-end;
-    width: 100%;
-}
-
-.banner-area{
-    width: 100%;
-    height: 500px;
-    position: fixed;
-    top: 100px;
-    background-image: url('https://github.com/ION606/selmer-bot-website/blob/main/assets/Header%20BK.gif?raw=true');  
-    background-size: cover; 
-    background-repeat: no-repeat;
-    background-position: center center;
-}
-
-.banner-area h2 {
-    padding: 8%;
-    font-size: 70px;
-    font-family: sans-serif, poppins;
-    text-transform: uppercase;
-    color: #fff;
-}
-
-.content-area {
-    width: 100%;
-    height: auto;
-    margin-top: 100px;
-    position: relative;
-    top: 450px;
-    background-color: rgb(41, 42, 48);
-}
-
-footer{
-    background-color: rgb(41, 42, 48);
-}
-
-.footer-area {
-    padding-top: 30px;
-    width: 100%;
-    position: relative;
-    top: 450px;
-    background-color: rgb(41, 42, 48);
-}
 

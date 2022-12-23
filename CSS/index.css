@@ -10,6 +10,7 @@ html {
     height:100%; 
     margin:0; 
     padding:0; 
+    overflow-x: hidden;
 }
 
 body {
@@ -24,7 +25,8 @@ body {
 /* Better Scroll Bar */
 
 body::-webkit-scrollbar {
-    width: .5rem
+    width: .7rem;
+    height: .7rem;
 }
 
 body::-webkit-scrollbar-track{
@@ -35,6 +37,7 @@ body::-webkit-scrollbar-thumb {
     background-color: rgb(60,60,60);
     border-radius: 10px;
 }
+
 
 
 
@@ -56,27 +59,22 @@ header{
 }
 
 .brand-name {
-
     /* class for band name: should be centered wherever it is */
     text-align: center;
-
     /* heading elements like h1 all have margins: let the margins be 0 */
     margin: 0; 
-
     font-size: 1em;
-
     /* changing the everything tag's font set on the heading to be different  */
     font-family: Rajdhani, sans-serif, poppins;
-
     /*
     Since heading are by default bolded, the font-weight can be changed to 
     normalize the bolded text
     */
     font-weight: normal;
-
     /* All band names should be white */
     color: white;
 }
+
 
 .band-name-large {
     font-size: 2em;
@@ -127,7 +125,7 @@ header{
 }
 
 
-@media (max-width: 1350px){
+@media (max-width: 800px){
 	.toggle-button {
 		display: flex;
 	}
@@ -158,6 +156,23 @@ header{
 	.navbar-links.active {
 		display: flex;
 	}
+
+    .brand-name {
+        /* class for band name: should be centered wherever it is */
+        text-align: center;
+        /* heading elements like h1 all have margins: let the margins be 0 */
+        margin: 0; 
+        font-size: .8em;
+        /* changing the everything tag's font set on the heading to be different  */
+        font-family: Rajdhani, sans-serif, poppins;
+        /*
+        Since heading are by default bolded, the font-weight can be changed to 
+        normalize the bolded text
+        */
+        font-weight: normal;
+        /* All band names should be white */
+        color: white;
+    }
 }
 
 

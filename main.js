@@ -21,7 +21,6 @@ const mongouri = process.env.mongouri;
 const client = new MongoClient(mongouri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 const connection = client.connect();
 
-
 const bot = new Client({ 
     intents: [
         Intents.FLAGS.GUILDS,
@@ -629,3 +628,4 @@ app.get("*",(req,res) => {
 })
 
 app.listen(port, () => console.log(`App listening on port ${port}`));
+

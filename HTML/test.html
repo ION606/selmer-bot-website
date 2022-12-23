@@ -167,15 +167,22 @@
 		// 	var clon = temp.content.cloneNode(true);
 		// 	document.body.appendChild(clon);
 		// }
+        const toggleButton = document.getElementsByClassName('toggle-button')[0];
+        const navbarLinks = document.getElementsByClassName('navbar-links')[0];
+
+        
+        if (toggleButton){
+            toggleButton.addEventListener('click', () => {
+                navbarLinks.classList.toggle('active')
+            })
+        }
 	</script>
 </head>
 
 
 
 <body>
-
     <div class="box-area">
-
         <header>
             <div class="main-header">
                 <nav class="navigation">
@@ -198,19 +205,15 @@
                             <li>
                                 <a href="myGuilds" id="guildslink" class="nav-link"><i class="fa-solid fa-server" alt="Servers" style="scale: 2; color: rgb(11, 189, 189);"></i></a>
                             </li>
-                            
                             <li>
                                 <a href="calendar" id="callink" class="nav-link"><i class="fa-solid fa-calendar" alt="Calendar" style="scale: 2; color: lightgrey;"></i></a>
                             </li>
-            
                             <li>
                                 <a href="https://docs.selmerbot.com" target="_blank" class="nav-link"><i class="fa-solid fa-book" style="scale: 2; color: white;" alt="WIKI"></i></a>
                             </li>
-                            
                             <li>
                                 <a href="premium" class="nav-link"><i class="fa-solid fa-crown" style="scale: 2; color: gold;" alt="PREMIUM"></i></a>
                             </li>
-            
                             <li>
                                 <a href="team" class="nav-link"><i class="fa-solid fa-user-gear" style="scale: 2; color: rgb(12, 216, 5);" alt="AUTHOR"></i></a>
                             </li>
@@ -464,7 +467,6 @@
                 </li>
             </ul>
         </footer>
-
     </div>
 </body>
 </html>

@@ -30,7 +30,7 @@
         async function openNewCalWindow(evjs, day) {
             const ev = JSON.parse(evjs);
             
-            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/calEvent','popUpWindow','loaction=no,width=600,height=300,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('https://selmerbot.com/calEvent','popUpWindow','loaction=no,width=600,height=300,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 
@@ -45,7 +45,7 @@
 
 
         async function createCalEvent(day) {
-            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/newCalEvent','popUpWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('https://selmerbot.com/newCalEvent','popUpWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 
@@ -134,7 +134,7 @@
         function getSessionData() {
             return new Promise((resolve, reject) => {
                 var xhrsess = new XMLHttpRequest();
-                xhrsess.open('post', 'https://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.open('post', 'https://selmerbot.com/getSessionInfo/', true);
                 xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
 
@@ -156,7 +156,7 @@
                 if (window.location.href.indexOf('localhost') != -1) {
                     window.location = 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
                 } else {
-                    window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fwww.selmerbot.com%2F&response_type=token&scope=identify%20guilds';
+                    window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fselmerbot.com%2F&response_type=token&scope=identify%20guilds';
                 }
             }
 
@@ -167,7 +167,7 @@
                 const id = sessionInfo.userId;
                 //Check if the user has premium
                 var xhrverify = new XMLHttpRequest();
-                xhrverify.open('post', 'https://www.selmerbot.com/verifypremium/', true);
+                xhrverify.open('post', 'https://selmerbot.com/verifypremium/', true);
                 xhrverify.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
                 //Use the guild Id as the userId
@@ -179,7 +179,7 @@
                     }
 
                     var xhr2 = new XMLHttpRequest();
-                    xhr2.open('get', 'https://www.selmerbot.com/getCal/', true);
+                    xhr2.open('get', 'https://selmerbot.com/getCal/', true);
                     xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
                     //Use the guild Id as the userId

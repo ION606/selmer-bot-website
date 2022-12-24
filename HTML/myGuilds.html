@@ -58,7 +58,7 @@
         function getSessionData() {
             return new Promise((resolve, reject) => {
                 var xhrsess = new XMLHttpRequest();
-                xhrsess.open('post', 'https://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.open('post', 'https://selmerbot.com/getSessionInfo/', true);
                 // xhrsess.open('post', 'http://localhost:53134/getSessionInfo/', true);
                 xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
@@ -83,7 +83,7 @@
                     if (window.location.href.indexOf('localhost') != -1) {
                         window.location = 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
                     } else {
-                        window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fwww.selmerbot.com%2F&response_type=token&scope=identify%20guilds';
+                        window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fselmerbot.com%2F&response_type=token&scope=identify%20guilds';
                     }
                 }
 
@@ -118,13 +118,13 @@
 
                         imagem.onclick = function() {
                             var xhr = new XMLHttpRequest();
-                            xhr.open('post', 'https://www.selmerbot.com/setCurrentServer/', true);
+                            xhr.open('post', 'https://selmerbot.com/setCurrentServer/', true);
                             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                             xhr.setRequestHeader('serverNumber', guilds[i].id);
                             xhr.setRequestHeader('sessionid', window.localStorage.getItem("sessionId"));
                             xhr.onloadend = (e) => {
                                 // window.sessionStorage.setItem('serverInfo', (xhr.response));
-                                window.location = 'https://www.selmerbot.com/dashboard';
+                                window.location = 'https://selmerbot.com/dashboard';
                             }
                             xhr.send();
                         }
@@ -137,7 +137,7 @@
                             if (window.location.href.indexOf('localhost') != -1) {
                                 url = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&permissions=549755289087&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2FjoinedGuild&response_type=code&scope=rpc%20bot%20applications.commands'
                             } else {
-                                url = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&permissions=549755289087&redirect_uri=https%3A%2F%2Fwww.selmerbot.com%2FjoinedGuild&scope=bot%20applications.commands'
+                                url = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&permissions=549755289087&redirect_uri=https%3A%2F%2Fselmerbot.com%2FjoinedGuild&scope=bot%20applications.commands'
                             }
                             window.open(url);
                         }//OPEN A NEW WINDOW WITH SERVER INVITE

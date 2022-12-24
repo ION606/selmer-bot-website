@@ -591,6 +591,14 @@ app.post("/newics", async(req, res) => {
 */
 
 
+app.get("/userData", async (req, res) => {
+	connection.then((client) => {
+		const headers = req.headers;
+		const dbo = client.db();
+	});
+});
+
+
 app.get('/', async ({ query }, response) => {
 	const { code } = query;
 
@@ -603,7 +611,7 @@ app.get('/', async ({ query }, response) => {
 					client_secret: clientSecret,
 					code,
 					grant_type: 'authorization_code',
-					redirect_uri: `https://www.selmerbot.com/`,
+					redirect_uri: `https://selmerbot.com/`,
 					scope: 'identify',
 				}),
 				headers: {

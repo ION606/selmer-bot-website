@@ -27,7 +27,7 @@
         async function openNewCalWindow(evjs, day) {
             const ev = JSON.parse(evjs);
             
-            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/calEvent','popUpWindow','loaction=no,width=600,height=300,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('https://selmerbot.com/calEvent','popUpWindow','loaction=no,width=600,height=300,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 
@@ -45,7 +45,7 @@
 
 
         async function createCalEvent(day) {
-            await new Promise((res, rej) => { res(window.open('https://www.selmerbot.com/newCalEvent','popUpWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
+            await new Promise((res, rej) => { res(window.open('https://selmerbot.com/newCalEvent','popUpWindow','loaction=no,width=400,height=350,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')); })
                 .then((w) => {
                 if (!w) { w.close(); return alert("Your browser has JavaScript Disabled!"); }
 
@@ -133,7 +133,7 @@
         function getSessionData() {
             return new Promise((resolve, reject) => {
                 var xhrsess = new XMLHttpRequest();
-                xhrsess.open('post', 'https://www.selmerbot.com/getSessionInfo/', true);
+                xhrsess.open('post', 'https://selmerbot.com/getSessionInfo/', true);
                 xhrsess.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 xhrsess.setRequestHeader('session', window.localStorage.getItem('sessionId'));
 
@@ -158,7 +158,7 @@
                     if (window.location.href.indexOf('localhost') != -1) {
                         window.location = 'https://discord.com/api/oauth2/authorize?client_id=926551095352901632&redirect_uri=http%3A%2F%2Flocalhost%3A53134%2F&response_type=token&scope=identify%20guilds';
                     } else {
-                        window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fwww.selmerbot.com%2F&response_type=code&scope=identify%20guilds';
+                        window.location = 'https://discord.com/api/oauth2/authorize?client_id=944046902415093760&redirect_uri=https%3A%2F%2Fselmerbot.com%2F&response_type=code&scope=identify%20guilds';
                     }
                 }
 
@@ -167,7 +167,7 @@
 
                 //Check if the user has premium
                 var xhrverify = new XMLHttpRequest();
-                xhrverify.open('post', 'https://www.selmerbot.com/verifypremium/', true);
+                xhrverify.open('post', 'https://selmerbot.com/verifypremium/', true);
                 xhrverify.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
                 //Use the guild Id as the userId
@@ -176,7 +176,7 @@
 
                     // //Load the channels
                     // var xhr = new XMLHttpRequest();
-                    // xhr.open('get', `https://www.selmerbot.com/getChannels/`, true);
+                    // xhr.open('get', `https://selmerbot.com/getChannels/`, true);
                     // xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                     // xhr.setRequestHeader('serverNumber', id);
                     // xhr.onloadend = (e) => {
@@ -277,7 +277,7 @@
 
 
                     var xhr2 = new XMLHttpRequest();
-                    xhr2.open('get', 'https://www.selmerbot.com/getCal/', true);
+                    xhr2.open('get', 'https://selmerbot.com/getCal/', true);
                     xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
                     xhr2.setRequestHeader('guildId', id);
@@ -322,7 +322,7 @@
 
         function logout() {
             var xhr = new XMLHttpRequest();
-            xhr.open('post', 'https://www.selmerbot.com/logout/', true);
+            xhr.open('post', 'https://selmerbot.com/logout/', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xhr.setRequestHeader('sessionid', window.localStorage.getItem('sessionId'));
 
@@ -403,7 +403,7 @@
 
                 //Send the data to the server
                 var xhr = new XMLHttpRequest();
-                xhr.open('post', 'https://www.selmerbot.com/sendData/', true);
+                xhr.open('post', 'https://selmerbot.com/sendData/', true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 xhr.setRequestHeader('serverSettings', JSON.stringify(serverSettings));
 
@@ -411,7 +411,7 @@
                     if (xhr.response == 'DONE') {
                         //Change the current server data
                         var xhrs = new XMLHttpRequest();
-                        xhrs.open('post', 'https://www.selmerbot.com/setCurrentServer/', true);
+                        xhrs.open('post', 'https://selmerbot.com/setCurrentServer/', true);
                         xhrs.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                         xhrs.setRequestHeader('serverNumber', serverInfo.Id);
                         xhrs.setRequestHeader('sessionid', window.localStorage.getItem("sessionId"));

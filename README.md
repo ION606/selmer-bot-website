@@ -1,2 +1,4 @@
+# THIS REPOSITORY HAS BEEN MIRRORED TO THE SELMER BOT ORGANIZATION AND IS NOW READ-ONLY
+
 # selmer-bot-website
 A website/dashboard for Selmer Bot

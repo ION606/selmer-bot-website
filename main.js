@@ -219,7 +219,8 @@ app.get('/getChannels', async (req, res) => {
 
 //Headers: servernumber, sessionid
 app.post('/setCurrentServer', async (req, res) => {
-	setCurrentServer().then((code) => {
+	const {servernumber, sessionid} = req.headers;
+	setCurrentServer(sessionid, servernumber).then((code) => {
 		res.sendStatus(code);
 	}).catch((err) => {
 		console.error(err);
@@ -596,6 +597,16 @@ app.get("/userData", async (req, res) => {
 		const headers = req.headers;
 		const dbo = client.db();
 	});
+});
+
+
+app.get("/releases", async (req, res) => {
+	res.sendFile('releases.html', { root: 'HTML' });
+});
+
+
+app.get("/downloads/*", async (req, res) => {
+	return res.sendFile(`${req.path}`, {root: '.'});
 });
 
 
